@@ -1,6 +1,5 @@
 # Port Management System
-**RMIT University Vietnam**
-**Course:** COSC2081 - Programming 1  
+**RMIT University Vietnam** COSC2081 - Programming 1  
 **Instructors:** Mr. Minh Vu & Dr. Phong Ngo  
 **Group:** Team Hi
 
