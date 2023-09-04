@@ -5,13 +5,15 @@ import Container.Container;
 
 // IVehicle interface
 public interface IVehicle {
-    void loadContainer(Container container);
+    boolean loadContainer(Container container);
 
-    void unloadContainer(Container container);
+    boolean unloadContainer(String id);
+
+    boolean canMoveTo(IPort port);
 
     void moveTo(IPort port);
 
     void refuel();
 
-    boolean canMoveTo(IPort port);
+    void refuel(double amount);
 }
