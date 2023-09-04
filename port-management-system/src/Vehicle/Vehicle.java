@@ -1,6 +1,7 @@
 package Vehicle;
 
 import Port.IPort;
+import Port.Port;
 import Container.Container;
 
 import java.util.ArrayList;
@@ -103,11 +104,11 @@ public class Vehicle implements IVehicle{
             containers.add(container);
             totalContainers++;
             // add to container type
-            if (container.getType().equals("Dry Storage")) { // use getType from container
+            if (container.getType().equals("DryStorage")) { // use getType from container
                 dryStorageContainers++;
-            } else if (container.getType().equals("Open Top")) {
+            } else if (container.getType().equals("OpenTop")) {
                 openTopContainers++;
-            } else if (container.getType().equals("Open Side")) {
+            } else if (container.getType().equals("OpenSide")) {
                 openSideContainers++;
             } else if (container.getType().equals("Refrigerated")) {
                 refrigeratedContainers++;

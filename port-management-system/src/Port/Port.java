@@ -9,7 +9,8 @@ package Port;
 
 import Container.Container;
 import Vehicle.IVehicle;
-
+import Trip.Trip;
+import Vehicle.Vehicle;
 import java.util.Date;
 import java.util.List;
 

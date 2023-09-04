@@ -5,7 +5,6 @@ package Container;
  * It inherits from the Container class and has no additional attributes or methods.
  */
 public class OpenSide extends Container {
-
     /**
      * Constructs a new OpenSide container.
      *
