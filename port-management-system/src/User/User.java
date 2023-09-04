@@ -111,7 +111,7 @@ public class User implements IUser {
      * Main method for testing user login functionality.
      *
      * @param args Command-line arguments (not used)
-     */
+
     public static void main(String[] args) {
         String username = "admin";  // Replace with user input
         String password = "admin123";  // Replace with user input
@@ -128,4 +128,5 @@ public class User implements IUser {
             System.out.println("Authentication failed.");
         }
     }
+    */
 }
