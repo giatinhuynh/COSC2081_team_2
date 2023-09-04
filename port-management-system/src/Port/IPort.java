@@ -16,7 +16,7 @@ public interface IPort {
 
     public boolean addContainer(Container container);
 
-    public boolean removeContainer(Container container);
+    public boolean removeContainer(String containerID);
 
     public void listVehicles();
 
