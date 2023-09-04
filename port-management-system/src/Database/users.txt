@@ -1,0 +1,3 @@
+ADMIN, admin, admin123,
+PORT-MANAGER, portmanager1, portmanager1, port1
+PORT-MANAGER, portmanager2, portmanager2, port2
