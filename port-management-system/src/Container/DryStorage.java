@@ -13,6 +13,6 @@ public class DryStorage extends Container {
      * @param weight The weight of the DryStorage container.
      */
     public DryStorage(String id, double weight) {
-        super(id, weight, 3.5, 4.6);
+        super(id, "DryStorage", weight, 3.5, 4.6);
     }
 }

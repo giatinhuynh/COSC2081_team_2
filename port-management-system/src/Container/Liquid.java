@@ -13,6 +13,6 @@ public class Liquid extends Container {
      * @param weight The weight of the Liquid container.
      */
     public Liquid(String id, double weight) {
-        super(id, weight, 4.8, 5.3);
+        super(id, "Liquid", weight,4.8, 5.3);
     }
 }

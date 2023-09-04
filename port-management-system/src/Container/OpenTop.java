@@ -13,6 +13,6 @@ public class OpenTop extends Container {
      * @param weight The weight of the OpenTop container.
      */
     public OpenTop(String id, double weight) {
-        super(id, weight, 2.8, 3.2);
+        super(id, "OpenTop", weight, 2.8, 3.2);
     }
 }

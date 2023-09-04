@@ -13,6 +13,6 @@ public class OpenSide extends Container {
      * @param weight The weight of the OpenSide container.
      */
     public OpenSide(String id, double weight) {
-        super(id, weight, 2.7, 3.2);
+        super(id, "OpenSide", weight,2.7, 3.2);
     }
 }

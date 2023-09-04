@@ -13,6 +13,6 @@ public class Refrigerated extends Container {
      * @param weight The weight of the Refrigerated container.
      */
     public Refrigerated(String id, double weight) {
-        super(id, weight, 4.5, 5.4);
+        super(id, "Refrigerated", weight, 4.5, 5.4);
     }
 }
