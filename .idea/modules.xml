@@ -3,10 +3,8 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/COSC2081_team_2.iml" filepath="$PROJECT_DIR$/.idea/COSC2081_team_2.iml" />
-      <module fileurl="file://$PROJECT_DIR$/Container/Container.iml" filepath="$PROJECT_DIR$/Container/Container.iml" />
-      <module fileurl="file://$PROJECT_DIR$/Port/Port.iml" filepath="$PROJECT_DIR$/Port/Port.iml" />
-      <module fileurl="file://$PROJECT_DIR$/User/User.iml" filepath="$PROJECT_DIR$/User/User.iml" />
       <module fileurl="file://$PROJECT_DIR$/Vehicle/Vehicle.iml" filepath="$PROJECT_DIR$/Vehicle/Vehicle.iml" />
+      <module fileurl="file://$PROJECT_DIR$/port-management-system/port-management-system.iml" filepath="$PROJECT_DIR$/port-management-system/port-management-system.iml" />
     </modules>
   </component>
 </project>
