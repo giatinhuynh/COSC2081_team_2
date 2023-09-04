@@ -4,20 +4,18 @@
   Semester: 2023B
   Assessment: Assessment 3 - Group Assessment
   Group members:
-
+  Huynh Duc Gia Tin (s3962053)
+  Phan Nhat Minh (s3978598)
+  Nguyen Viet Ha (s3978128)
+  Vu Minh Ha (s3978681)
   Created  date: 02/09/2023
   Acknowledgement:
 */
 
+import static Menu.Menu.onboardScreen;
+
 public class Main {
     public static void main(String[] args) {
-        System.out.println("COSC2081 GROUP ASSIGNMENT");
-        System.out.println("CONTAINER PORT MANAGEMENT SYSTEM");
-        System.out.println("Instructor: Mr. Minh Vu & Dr. Phong Ngo");
-        System.out.println("Group: TeamHi");
-        System.out.println("sXXXXXXX, Student Name");
-        System.out.println("sXXXXXXX, Student Name");
-        System.out.println("sXXXXXXX, Student Name");
-        System.out.println("sXXXXXXX, Student Name");
+        onboardScreen();
     }
 }
