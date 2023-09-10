@@ -12,18 +12,21 @@
   Created  date: 02/09/2023
   Acknowledgement: chat.openai.com, stackoverflow.com, geeksforgeeks.org, javatpoint.com, tutorialspoint.com, oracle.com, w3schools.com, github.com, codejava.net, baeldung.com, mkyong.com, javacodegeeks.com, journaldev.com
 */
+
 import views.display.StaticDisplay;
 import views.display.LoginView;
 
 public class Main {
+
+    // Create static objects
     private static final StaticDisplay staticDisplay = new StaticDisplay();
     private static final LoginView loginView = new LoginView();
 
     public static void main(String[] args) {
-        staticDisplay.screenBreak();
+        // Display the assessment information
         staticDisplay.displayAssessmentInfo();
-        staticDisplay.screenBreak();
 
+        // Display the login view
         loginView.displayLoginView();
     }
 }
