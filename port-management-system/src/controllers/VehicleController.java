@@ -1,6 +1,6 @@
 package controllers;
 
-import database.DatabaseManager;
+import database.DatabaseHandler;
 import models.vehicle.Ship;
 import models.vehicle.Truck;
 import models.vehicle.Vehicle;
@@ -10,7 +10,7 @@ import java.util.Scanner;
 
 public class VehicleController extends BaseController {
 
-    private DatabaseManager dbManager;
+    private DatabaseHandler dbManager;
     private Scanner scanner;
 
     // Methods for CRUD operations, refueling, etc.

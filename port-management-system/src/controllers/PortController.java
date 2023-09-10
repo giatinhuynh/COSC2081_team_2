@@ -1,17 +1,26 @@
 package controllers;
 
-import database.DatabaseManager;
+import database.DatabaseHandler;
+import interfaces.ICRUD;
 import models.port.Port;
+import utils.Constants;
+
+import java.io.IOException;
+import java.util.List;
 import java.util.Scanner;
 
-import java.util.List;
+public class PortController extends BaseController implements ICRUD {
 
-public class PortController extends BaseController {
+    private final DatabaseHandler dbHandler;
+    private final String PORT_DATA_PATH = Constants.PORTS_FILE_PATH;
+    private final Scanner scanner = new Scanner(System.in);
 
-    private DatabaseManager dbManager;
-    private Scanner scanner;
+    public PortController() {
+        this.dbHandler = new DatabaseHandler();
+    }
 
-    public void createNewPort() {
+    @Override
+    public void create() {
         System.out.println("Creating a new port wizard");
 
         System.out.print("Enter port ID: ");
@@ -31,11 +40,24 @@ public class PortController extends BaseController {
 
         System.out.print("Enter port landing ability: ");
         boolean portLandingAbility = scanner.nextBoolean();
-
+        // Example: This would usually take an input, e.g., from a GUI or console
         Port newPort = new Port(portId, portName, portLatitude, portLongitude, portStoringCapacity, portLandingAbility);
-        dbManager.savePort(newPort);
+        try {
+            dbHandler.writeToFile(PORT_DATA_PATH, newPort);
+        } catch (IOException e) {
+            System.out.println("Error writing to file: " + e.getMessage());
+        }
+    }
 
-        System.out.println("Port created successfully!");
+    @Override
+    public void read() {
+        try {
+            Port readPort = (Port) dbHandler.readFromFile(PORT_DATA_PATH, );
+            // Usually, you'd return this object, or process it, or display it
+            System.out.println(readPort.getName()); // Just a demonstration
+        } catch (IOException | ClassNotFoundException e) {
+            System.out.println("Error reading from file: " + e.getMessage());
+        }
     }
 
     public void updateExistingPort() {

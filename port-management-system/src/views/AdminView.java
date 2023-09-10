@@ -1,7 +1,13 @@
 package views;
 
-import controllers.*;
+import controllers.ContainerController;
+import controllers.PortController;
+import controllers.UserController;
+import controllers.VehicleController;
 
+/**
+ * This class represents the view for the admin user, providing a menu to manage various aspects of the system.
+ */
 public class AdminView extends BaseView {
 
     private final PortController adminPortController = new PortController();
@@ -9,6 +15,10 @@ public class AdminView extends BaseView {
     private final VehicleController adminVehicleController = new VehicleController();
     private final UserController adminUserController = new UserController();
 
+    /**
+     * Displays the main admin menu to manage ports, containers, vehicles, and users.
+     * Allows the admin user to navigate to specific sub-menus or log out.
+     */
     public void displayAdminMenu() {
         displayMessage("=== ADMIN MENU ===");
         displayMessage("1. Manage Ports");
@@ -31,6 +41,9 @@ public class AdminView extends BaseView {
         }
     }
 
+    /**
+     * Displays the admin menu for managing ports, providing options to add, update, delete, search, or view all ports.
+     */
     public void displayAdminPortsMenu() {
         displayMessage("=== ADMIN PORTS MENU ===");
         displayMessage("1. Add Port");
@@ -55,6 +68,9 @@ public class AdminView extends BaseView {
         }
     }
 
+    /**
+     * Displays the admin menu for managing containers, providing options to add, update, delete, search, or view all containers.
+     */
     public void displayAdminContainersMenu() {
         displayMessage("=== ADMIN CONTAINERS MENU ===");
         displayMessage("1. Add Container");
@@ -80,6 +96,9 @@ public class AdminView extends BaseView {
 
     }
 
+    /**
+     * Displays the admin menu for managing vehicles, providing options to add, update, delete, search, or view all vehicles.
+     */
     public void displayAdminVehiclesMenu() {
         displayMessage("=== ADMIN VEHICLES MENU ===");
         displayMessage("1. Add Vehicle");
@@ -104,6 +123,9 @@ public class AdminView extends BaseView {
         }
     }
 
+    /**
+     * Displays the admin menu for managing users, providing options to add, update, delete, search, or view all port managers.
+     */
     public void displayAdminUsersMenu() {
         displayMessage("=== ADMIN PORT MANAGERS MENU ===");
         displayMessage("1. Add Port Manager");
@@ -127,6 +149,4 @@ public class AdminView extends BaseView {
             }
         }
     }
-
 }
-

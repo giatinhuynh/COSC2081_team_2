@@ -1,9 +1,5 @@
 package models.user;
 
-import database.DatabaseManager;
-
-import java.util.Scanner;
-
 public class SystemAdmin extends User {
 
 
@@ -15,8 +11,10 @@ public class SystemAdmin extends User {
     // e.g., viewAllPorts(), viewAllTrips(), etc.
 
     public SystemAdmin() {
-        this("admin", "admin");
-        DatabaseManager dbManager = new DatabaseManager();
-        Scanner scanner = new Scanner(System.in);
+    }
+
+    @Override
+    public boolean verifyLogin(String username, String inputPassword) {
+        return username.equals("admin") && inputPassword.equals("admin");
     }
 }

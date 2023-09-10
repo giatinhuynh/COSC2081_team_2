@@ -7,6 +7,10 @@ public abstract class User implements Serializable {
     private String password;
     private String role;  // e.g., "SystemAdmin", "PortManager"
 
+    public User() {
+
+    }
+
     public User(String username, String password, String role) {
         this.username = username;
         this.password = password;  // For simplicity; in a real system, you'd hash and salt this
@@ -17,12 +21,14 @@ public abstract class User implements Serializable {
         return username;
     }
 
-    public boolean verifyPassword(String inputPassword) {
-        return this.password.equals(inputPassword);
-    }
+    public abstract boolean verifyLogin(String username, String inputPassword);
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getPassword() {
+        return password;
     }
 
     public String getRole() {
