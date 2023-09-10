@@ -23,11 +23,11 @@ This repository contains the codebase for a Java-based port management system. T
 
 1. Clone this repository
     ```bash
-    git clone https://github.com/your-team-name/port-management-system.git
+    git clone https://github.com/giatinhuynh/COSC2081_team_2.git
     ```
 2. Navigate to the project directory
     ```bash
-    cd port-management-system
+    cd COSC2081_team_2/port-management-system
     ```
 3. Compile the Java files
     ```bash
