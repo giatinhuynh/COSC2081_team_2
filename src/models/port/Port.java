@@ -89,6 +89,8 @@ public class Port implements Serializable {
         return currentContainers;
     }
 
+    public List<Vehicle> getCurrentVehicles() {return currentVehicles;}
+
     // Methods
     /**
      * Calculates the distance in kilometers between the current port and another port
