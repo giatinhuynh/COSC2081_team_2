@@ -1,4 +1,4 @@
-package controllers;
+package services;
 
 public class StatisticsController {
 }

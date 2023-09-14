@@ -13,7 +13,7 @@
   Acknowledgement: chat.openai.com, stackoverflow.com, geeksforgeeks.org, javatpoint.com, tutorialspoint.com, oracle.com, w3schools.com, github.com, codejava.net, baeldung.com, mkyong.com, javacodegeeks.com, journaldev.com
 */
 
-package controllers;
+package services;
 
 import utils.Constants;
 import database.DatabaseHandler;
@@ -21,7 +21,7 @@ import models.port.Port;
 
 import java.util.*;
 
-public class PortController extends BaseController {
+public class PortServices extends BaseController {
 
     private final Scanner scanner = new Scanner(System.in);
     private final String PORT_FILE_PATH = Constants.PORT_FILE_PATH;

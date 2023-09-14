@@ -1,4 +1,4 @@
-package controllers;
+package services;
 
 import models.trip.Trip;
 import models.vehicle.Vehicle;
@@ -37,12 +37,12 @@ public class TripController extends BaseController {
         }
 
         // Using PortController to display available Ports for departure and arrival
-        PortController portController = new PortController();
+        PortServices portServices = new PortServices();
 
-        portController.displayAll(); // Display all ports
+        portServices.displayAll(); // Display all ports
         System.out.print("Enter departure port ID: ");
         String departurePortId = scanner.nextLine();
-        Port departurePort = portController.getPortById(departurePortId);
+        Port departurePort = portServices.getPortById(departurePortId);
         if (departurePort == null) {
             System.out.println("Invalid departure port ID. Aborting trip creation.");
             return;
@@ -50,7 +50,7 @@ public class TripController extends BaseController {
 
         System.out.print("Enter arrival port ID: ");
         String arrivalPortId = scanner.nextLine();
-        Port arrivalPort = portController.getPortById(arrivalPortId);
+        Port arrivalPort = portServices.getPortById(arrivalPortId);
         if (arrivalPort == null) {
             System.out.println("Invalid arrival port ID. Aborting trip creation.");
             return;

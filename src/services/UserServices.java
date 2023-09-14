@@ -1,4 +1,4 @@
-package controllers;
+package services;
 
 import models.port.Port;
 import utils.Constants;
@@ -8,11 +8,12 @@ import models.user.PortManager;
 
 import java.util.*;
 
-public class UserController extends BaseController {
+public class UserServices extends BaseController {
 
     private final Scanner scanner = new Scanner(System.in);
     private final String USER_FILE_PATH = Constants.USER_FILE_PATH;
     private final DatabaseHandler dbHandler = new DatabaseHandler();
+    public static User currentUser;
 
     @Override
     public void create() {
@@ -34,8 +35,8 @@ public class UserController extends BaseController {
             System.out.print("Enter managed port ID: ");
             String managedPortId = scanner.nextLine();
             // Note: Here, I'm assuming you have a method in PortController to get the port by ID.
-            PortController portController = new PortController();
-            Port managedPort = portController.getPortById(managedPortId);
+            PortServices portServices = new PortServices();
+            Port managedPort = portServices.getPortById(managedPortId);
             newUser = new PortManager(username, password, managedPort);
         } else {
             System.out.println("Invalid user type!");
@@ -208,5 +209,34 @@ public class UserController extends BaseController {
 
     public boolean adminValidation(String username, String password) {
         return username.equals("admin") && password.equals("admin");
+    }
+
+    public void setCurrentUser(String username) {
+        List<User> usersList;
+        try {
+            User[] usersArray = (User[]) dbHandler.readObjects(USER_FILE_PATH);
+            usersList = new ArrayList<>(Arrays.asList(usersArray));
+        } catch (Exception e) {
+            System.out.println("Error reading users or no users exist.");
+            return;
+        }
+
+        User userToSet = null;
+        for (User user : usersList) {
+            if (user.getUsername().equals(username)) {
+                userToSet = user;
+                break;
+            }
+        }
+
+        if (userToSet != null) {
+            currentUser = userToSet;
+        } else {
+            System.out.println("No user found with the given username.");
+        }
+    }
+
+    public static User getCurrentUser() {
+        return currentUser;
     }
 }
