@@ -1,8 +1,10 @@
 package views.flow;
 
 import views.BaseView;
+import services.ContainerServices;
 
 public class PortManagerFlow extends BaseView {
+    private final ContainerServices containerServices = new ContainerServices();
 
     public void PortManagerMenu() {
         displayMessage("=== PORT MANAGER MENU ===");
@@ -50,11 +52,14 @@ public class PortManagerFlow extends BaseView {
 
     public void PManagerLoadContainerMenu() {
         displayMessage("=== PORT MANAGER LOAD CONTAINER MENU ===");
-
+        containerServices.loadContainerFlow();
+        PManagerContainerMenu();
     }
 
     public void PManagerUnloadContainerMenu() {
-
+        displayMessage("=== PORT MANAGER UNLOAD CONTAINER MENU ===");
+        containerServices.unloadContainerFlow();
+        PManagerContainerMenu();
     }
 }
 
