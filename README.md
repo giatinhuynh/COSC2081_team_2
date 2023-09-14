@@ -7,10 +7,10 @@
 This repository contains the codebase for a Java-based port management system. The application aims to simplify and automate the operations involved in managing a port, such as tracking arriving and departing ships, managing cargo, and scheduling.
 
 ## Team Members
-- Member 1 (Lead Developer)
-- Member 2 (UI/UX Designer)
-- Member 3 (Database Manager)
-- Member 4 (Quality Assurance)
+- Phan Nhat Minh - s3978598
+- Huynh Duc Gia Tin - s3818078
+- Nguyen Viet Ha - s3978128
+- Vu Minh Ha - s3978681
 
 ## Table of Contents
 - [Installation](#installation)
