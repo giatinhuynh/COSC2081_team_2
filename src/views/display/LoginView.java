@@ -1,13 +1,13 @@
 package views.display;
 
 import java.util.Scanner;
-import controllers.UserController;
+import services.UserServices;
 import views.flow.AdminFlow;
 import views.flow.PortManagerFlow;
 
 public class LoginView {
     private final Scanner scanner = new Scanner(System.in);
-    private final UserController userController = new UserController();
+    private final UserServices userServices = new UserServices();
     private final AdminFlow adminFlow = new AdminFlow();
     private final PortManagerFlow portManagerFlow = new PortManagerFlow();
     private final StaticDisplay staticDisplay = new StaticDisplay();
@@ -19,13 +19,14 @@ public class LoginView {
         System.out.print("Password: ");
         String password = scanner.nextLine();
 
-        if (userController.loginValidation(username, password)) {
-            if (userController.adminValidation(username, password)) {
+        if (userServices.loginValidation(username, password)) {
+            if (userServices.adminValidation(username, password)) {
                 staticDisplay.loginSuccessful();
                 System.out.println("Welcome, System Admin!");
                 adminFlow.displayAdminMenu();
             } else {
                 staticDisplay.loginSuccessful();
+                userServices.setCurrentUser(username);
                 System.out.println("Welcome, Port Manager!");
                 portManagerFlow.PortManagerMenu();
             }
