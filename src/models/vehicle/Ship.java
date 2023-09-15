@@ -19,6 +19,9 @@ public class Ship extends Vehicle {
 
     @Override
     public double calculateFuelNeeded(Port destinationPort) {
+        if (this.currentPort == null) {
+            throw new IllegalStateException("The ship is not currently at a port!");
+        }
         Port currentPort = this.currentPort;
         double distance = DistanceCalculator.calculateDistance(
                 currentPort.getLatitude(),
@@ -43,6 +46,9 @@ public class Ship extends Vehicle {
 
     @Override
     public double calculateTimeNeeded(Port destinationPort) {
+        if (this.currentPort == null) {
+            throw new IllegalStateException("The ship is not currently at a port!");
+        }
         Port currentPort = this.currentPort;
         double distance = DistanceCalculator.calculateDistance(
                 currentPort.getLatitude(),
