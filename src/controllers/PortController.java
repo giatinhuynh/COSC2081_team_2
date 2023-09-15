@@ -15,9 +15,9 @@
 
 package controllers;
 
-import utils.Constants;
 import database.DatabaseHandler;
 import models.port.Port;
+import utils.Constants;
 
 import java.util.*;
 
@@ -26,6 +26,19 @@ public class PortController extends BaseController {
     private final Scanner scanner = new Scanner(System.in);
     private final String PORT_FILE_PATH = Constants.PORT_FILE_PATH;
     private final DatabaseHandler dbHandler = new DatabaseHandler();
+
+
+    // Modularized method to fetch ports from the database
+    private List<Port> fetchPortsFromDatabase() {
+        try {
+            Port[] portsArray = (Port[]) dbHandler.readObjects(PORT_FILE_PATH);
+            return new ArrayList<>(Arrays.asList(portsArray));
+        } catch (Exception e) {  // Catching a generic exception as a placeholder.
+            System.out.println("Error reading ports or no ports exist.");
+            return new ArrayList<>();
+        }
+    }
+
 
     @Override
     public void create() {
@@ -49,13 +62,7 @@ public class PortController extends BaseController {
 
         Port newPort = new Port(portId, name, latitude, longitude, storingCapacity, landingAbility);
 
-        List<Port> portsList;
-        try {
-            Port[] portsArray = (Port[]) dbHandler.readObjects(PORT_FILE_PATH);
-            portsList = new ArrayList<>(Arrays.asList(portsArray));
-        } catch (Exception e) {
-            portsList = new ArrayList<>();
-        }
+        List<Port> portsList = fetchPortsFromDatabase();
 
         portsList.add(newPort);
 
@@ -68,14 +75,7 @@ public class PortController extends BaseController {
         System.out.print("Enter port ID: ");
         String portIdToDisplay = scanner.nextLine();
 
-        List<Port> portsList;
-        try {
-            Port[] portsArray = (Port[]) dbHandler.readObjects(PORT_FILE_PATH);
-            portsList = new ArrayList<>(Arrays.asList(portsArray));
-        } catch (Exception e) {
-            System.out.println("Error reading ports or no ports exist.");
-            return;
-        }
+        List<Port> portsList = fetchPortsFromDatabase();
 
         Port portToDisplay = null;
         for (Port port : portsList) {
@@ -102,14 +102,7 @@ public class PortController extends BaseController {
     public void displayAll() {
         System.out.println("DISPLAY ALL PORTS INFO");
 
-        List<Port> portsList;
-        try {
-            Port[] portsArray = (Port[]) dbHandler.readObjects(PORT_FILE_PATH);
-            portsList = new ArrayList<>(Arrays.asList(portsArray));
-        } catch (Exception e) {
-            System.out.println("Error reading ports or no ports exist.");
-            return;
-        }
+        List<Port> portsList = fetchPortsFromDatabase();
 
         System.out.println("--------------------------------------------------------------------------------------");
         System.out.printf("| %-10s | %-20s | %-10s | %-10s | %-15s | %-15s |\n", "Port ID", "Name", "Latitude", "Longitude", "Storing Capacity", "Landing Ability");
@@ -128,14 +121,7 @@ public class PortController extends BaseController {
         System.out.print("Enter port ID to update: ");
         String portIdToUpdate = scanner.nextLine();
 
-        List<Port> portsList;
-        try {
-            Port[] portsArray = (Port[]) dbHandler.readObjects(PORT_FILE_PATH);
-            portsList = new ArrayList<>(Arrays.asList(portsArray));
-        } catch (Exception e) {
-            System.out.println("Error reading ports or no ports exist.");
-            return;
-        }
+        List<Port> portsList = fetchPortsFromDatabase();
 
         Port portToUpdate = null;
         for (Port port : portsList) {
@@ -193,14 +179,7 @@ public class PortController extends BaseController {
         System.out.print("Enter port ID to delete: ");
         String portIdToDelete = scanner.nextLine();
 
-        List<Port> portsList;
-        try {
-            Port[] portsArray = (Port[]) dbHandler.readObjects(PORT_FILE_PATH);
-            portsList = new ArrayList<>(Arrays.asList(portsArray));
-        } catch (Exception e) {
-            System.out.println("Error reading ports or no ports exist.");
-            return;
-        }
+        List<Port> portsList = fetchPortsFromDatabase();
 
         boolean isDeleted = false;
         Iterator<Port> iterator = portsList.iterator();
@@ -221,24 +200,19 @@ public class PortController extends BaseController {
         }
     }
 
+    /**
+     * Fetches a port based on its ID.
+     *
+     * @param portId ID of the port to be fetched.
+     * @return Port object if found, null otherwise.
+     */
     public Port getPortById(String portId) {
-        List<Port> portsList;
-        try {
-            Port[] portsArray = (Port[]) dbHandler.readObjects(PORT_FILE_PATH);
-            portsList = new ArrayList<>(Arrays.asList(portsArray));
-        } catch (Exception e) {
-            System.out.println("Error reading ports or no ports exist.");
-            return null;
-        }
-
-        Port portToReturn = null;
+        List<Port> portsList = fetchPortsFromDatabase();
         for (Port port : portsList) {
             if (port.getPortId().equals(portId)) {
-                portToReturn = port;
-                break;
+                return port;
             }
         }
-
-        return portToReturn;
+        return null;
     }
 }
