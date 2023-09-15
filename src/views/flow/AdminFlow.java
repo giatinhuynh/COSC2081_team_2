@@ -48,11 +48,26 @@ public class AdminFlow extends BaseView {
 
         int choice = promptForInput("Enter your choice: ");
         switch (choice) {
-            case 1 -> adminPortController.create();
-            case 2 -> adminPortController.update();
-            case 3 -> adminPortController.delete();
-            case 4 -> adminPortController.displayOne();
-            case 5 -> adminPortController.displayAll();
+            case 1 -> {
+                adminPortController.create();
+                displayAdminPortsMenu();
+            }
+            case 2 -> {
+                adminPortController.update();
+                displayAdminPortsMenu();
+            }
+            case 3 -> {
+                adminPortController.delete();
+                displayAdminPortsMenu();
+            }
+            case 4 -> {
+                adminPortController.displayOne();
+                displayAdminPortsMenu();
+            }
+            case 5 -> {
+                adminPortController.displayAll();
+                displayAdminPortsMenu();
+            }
             case 0 -> displayAdminMenu();
             default -> {
                 displayMessage("Invalid choice. Please try again.");
@@ -72,11 +87,26 @@ public class AdminFlow extends BaseView {
 
         int choice = promptForInput("Enter your choice: ");
         switch (choice) {
-            case 1 -> adminContainerController.create();
-            case 2 -> adminContainerController.update();
-            case 3 -> adminContainerController.delete();
-            case 4 -> adminContainerController.displayOne();
-            case 5 -> adminContainerController.displayAll();
+            case 1 -> {
+                adminContainerController.create();
+                displayAdminContainersMenu();
+            }
+            case 2 -> {
+                adminContainerController.update();
+                displayAdminContainersMenu();
+            }
+            case 3 -> {
+                adminContainerController.delete();
+                displayAdminContainersMenu();
+            }
+            case 4 -> {
+                adminContainerController.displayOne();
+                displayAdminContainersMenu();
+            }
+            case 5 -> {
+                adminContainerController.displayAll();
+                displayAdminContainersMenu();
+            }
             case 0 -> displayAdminMenu();
             default -> {
                 displayMessage("Invalid choice. Please try again.");
@@ -97,11 +127,26 @@ public class AdminFlow extends BaseView {
 
         int choice = promptForInput("Enter your choice: ");
         switch (choice) {
-            case 1 -> adminVehicleController.create();
-            case 2 -> adminVehicleController.update();
-            case 3 -> adminVehicleController.delete();
-            case 4 -> adminVehicleController.displayOne();
-            case 5 -> adminVehicleController.displayAll();
+            case 1 -> {
+                adminVehicleController.create();
+                displayAdminVehiclesMenu();
+            }
+            case 2 -> {
+                adminVehicleController.update();
+                displayAdminVehiclesMenu();
+            }
+            case 3 -> {
+                adminVehicleController.delete();
+                displayAdminVehiclesMenu();
+            }
+            case 4 -> {
+                adminVehicleController.displayOne();
+                displayAdminVehiclesMenu();
+            }
+            case 5 -> {
+                adminVehicleController.displayAll();
+                displayAdminVehiclesMenu();
+            }
             case 0 -> displayAdminMenu();
             default -> {
                 displayMessage("Invalid choice. Please try again.");
@@ -121,11 +166,26 @@ public class AdminFlow extends BaseView {
 
         int choice = promptForInput("Enter your choice: ");
         switch (choice) {
-            case 1 -> adminUserController.create();
-            case 2 -> adminUserController.update();
-            case 3 -> adminUserController.delete();
-            case 4 -> adminUserController.displayOne();
-            case 5 -> adminUserController.displayAll();
+            case 1 -> {
+                adminUserController.create();
+                displayAdminUsersMenu();
+            }
+            case 2 -> {
+                adminUserController.update();
+                displayAdminUsersMenu();
+            }
+            case 3 -> {
+                adminUserController.delete();
+                displayAdminUsersMenu();
+            }
+            case 4 -> {
+                adminUserController.displayOne();
+                displayAdminUsersMenu();
+            }
+            case 5 -> {
+                adminUserController.displayAll();
+                displayAdminUsersMenu();
+            }
             case 0 -> displayAdminMenu();
             default -> {
                 displayMessage("Invalid choice. Please try again");
@@ -145,11 +205,26 @@ public class AdminFlow extends BaseView {
 
         int choice = promptForInput("Enter your choice: ");
         switch (choice) {
-            case 1 -> adminTripController.create();
-            case 2 -> adminTripController.update();
-            case 3 -> adminTripController.delete();
-            case 4 -> adminTripController.displayOne();
-            case 5 -> adminTripController.displayAll();
+            case 1 -> {
+                adminTripController.create();
+                displayAdminTripsMenu();
+            }
+            case 2 -> {
+                adminTripController.update();
+                displayAdminTripsMenu();
+            }
+            case 3 -> {
+                adminTripController.delete();
+                displayAdminTripsMenu();
+            }
+            case 4 -> {
+                adminTripController.displayOne();
+                displayAdminTripsMenu();
+            }
+            case 5 -> {
+                adminTripController.displayAll();
+                displayAdminTripsMenu();
+            }
             case 0 -> displayAdminMenu();
             default -> {
                 displayMessage("Invalid choice. Please try again");
