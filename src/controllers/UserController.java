@@ -172,9 +172,9 @@ public class UserController extends BaseController {
         }
     }
 
-    public boolean loginValidation(String username, String password) {
+    public User loginValidation(String username, String password) {
         if (adminValidation(username, password)) {
-            return true;
+            return SystemAdmin.getInstance();  // Assuming SystemAdmin uses Singleton pattern as discussed
         } else {
             List<User> usersList;
             try {
@@ -182,19 +182,18 @@ public class UserController extends BaseController {
                 usersList = new ArrayList<>(Arrays.asList(usersArray));
             } catch (Exception e) {
                 System.out.println("Error reading users or no users exist.");
-                return false;
+                return null;
             }
 
-            User userToValidate = null;
             for (User user : usersList) {
                 if (user.getUsername().equals(username) && user.getPassword().equals(password)) {
-                    userToValidate = user;
-                    break;
+                    return user;  // Return the matched user
                 }
             }
-            return userToValidate != null;
+            return null;  // No user matched
         }
     }
+
 
     public boolean adminValidation(String username, String password) {
         return username.equals("admin") && password.equals("admin");
