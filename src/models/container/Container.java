@@ -5,28 +5,44 @@ import models.port.Port;
 
 import java.io.Serializable;
 
+/**
+ * Represents an abstract Container that can be associated with a Vehicle or a Port.
+ */
 public abstract class Container implements Serializable {
     private String containerId;
     private double weight;
-    private Vehicle currentVehicle;
-    private Port currentPort;
+    private Object location; // Can be either a Vehicle or a Port.
 
-    // Constructor
+    /**
+     * Initializes a new Container with the specified ID and weight.
+     * @param containerId The unique identifier for this container.
+     * @param weight The weight of this container.
+     */
     public Container(String containerId, double weight) {
         this.containerId = containerId;
         this.weight = weight;
     }
 
+    /**
+     * Initializes a new Container with the specified ID, weight, and associated Vehicle.
+     * @param containerId The unique identifier for this container.
+     * @param weight The weight of this container.
+     * @param currentVehicle The vehicle carrying this container.
+     */
     public Container(String containerId, double weight, Vehicle currentVehicle) {
-        this.containerId = containerId;
-        this.weight = weight;
-        this.currentVehicle = currentVehicle;
+        this(containerId, weight);
+        this.location = currentVehicle;
     }
 
+    /**
+     * Initializes a new Container with the specified ID, weight, and associated Port.
+     * @param containerId The unique identifier for this container.
+     * @param weight The weight of this container.
+     * @param currentPort The port where this container is located.
+     */
     public Container(String containerId, double weight, Port currentPort) {
-        this.containerId = containerId;
-        this.weight = weight;
-        this.currentPort = currentPort;
+        this(containerId, weight);
+        this.location = currentPort;
     }
 
     // Getters and setters
@@ -47,19 +63,25 @@ public abstract class Container implements Serializable {
     }
 
     public Vehicle getCurrentVehicle() {
-        return currentVehicle;
+        if (location instanceof Vehicle) {
+            return (Vehicle) location;
+        }
+        return null;
     }
 
     public void setCurrentVehicle(Vehicle currentVehicle) {
-        this.currentVehicle = currentVehicle;
+        this.location = currentVehicle;
     }
 
     public Port getCurrentPort() {
-        return currentPort;
+        if (location instanceof Port) {
+            return (Port) location;
+        }
+        return null;
     }
 
     public void setCurrentPort(Port currentPort) {
-        this.currentPort = currentPort;
+        this.location = currentPort;
     }
 
     // Abstract methods to be implemented by each container type.
