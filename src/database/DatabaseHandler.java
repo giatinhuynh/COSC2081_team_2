@@ -1,19 +1,13 @@
 package database;
 
 import java.io.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-/**
- * The DatabaseHandler class provides methods to write and read arrays of objects to/from a file.
- */
 public class DatabaseHandler {
 
-    /**
-     * Writes an array of objects to a file.
-     *
-     * @param filePath The path to the file where objects will be written.
-     * @param objects  The array of objects to be written to the file.
-     * @throws IllegalArgumentException If filePath is null or empty, or if objects is null.
-     */
+    private static final Logger logger = Logger.getLogger(DatabaseHandler.class.getName());
+
     public void writeObjects(String filePath, Object[] objects) {
         if (filePath == null || filePath.isEmpty()) {
             throw new IllegalArgumentException("File path must not be null or empty.");
@@ -28,18 +22,13 @@ public class DatabaseHandler {
                 ObjectOutputStream os = new ObjectOutputStream(fs);
         ) {
             os.writeObject(objects);
-        } catch (IOException | RuntimeException e) {
-            e.printStackTrace();
+        } catch (IOException e) {
+            logger.log(Level.SEVERE, "Failed to write objects to file: " + filePath, e);
+        } catch (RuntimeException e) {
+            logger.log(Level.SEVERE, "Unexpected error during write operation", e);
         }
     }
 
-    /**
-     * Reads an array of objects from a file.
-     *
-     * @param filePath The path to the file from which objects will be read.
-     * @return An array of objects read from the file.
-     * @throws IllegalArgumentException If filePath is null or empty.
-     */
     public Object[] readObjects(String filePath) {
         if (filePath == null || filePath.isEmpty()) {
             throw new IllegalArgumentException("File path must not be null or empty.");
@@ -52,9 +41,12 @@ public class DatabaseHandler {
                 ObjectInputStream os = new ObjectInputStream(fi);
         ) {
             objects = (Object[]) os.readObject();
-
-        } catch (ClassNotFoundException | IOException | RuntimeException e) {
-            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            logger.log(Level.SEVERE, "Class not found during deserialization from file: " + filePath, e);
+        } catch (IOException e) {
+            logger.log(Level.SEVERE, "Failed to read objects from file: " + filePath, e);
+        } catch (RuntimeException e) {
+            logger.log(Level.SEVERE, "Unexpected error during read operation", e);
         }
 
         return objects;
