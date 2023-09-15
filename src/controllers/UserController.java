@@ -1,6 +1,7 @@
 package controllers;
 
 import models.port.Port;
+import models.user.SystemAdmin;
 import utils.Constants;
 import database.DatabaseHandler;
 import models.user.User;
@@ -16,158 +17,147 @@ public class UserController extends BaseController {
 
     @Override
     public void create() {
-        System.out.println("USER CREATE WIZARD");
-        System.out.print("Enter user type (SystemAdmin or PortManager): ");
-        String userType = scanner.nextLine();
+        System.out.println("PORT MANAGER CREATE WIZARD");
+
         System.out.print("Enter username: ");
         String username = scanner.nextLine();
+
         System.out.print("Enter password: ");
         String password = scanner.nextLine();
 
-        User newUser = null;
+        System.out.print("Enter managed port ID: ");
+        String managedPortId = scanner.nextLine();
+        PortController portController = new PortController();
+        Port managedPort = portController.getPortById(managedPortId);
 
-        if (userType.equals("SystemAdmin")) {
-            System.out.println("Adding another System Admin is prohibited");
-            return;
-        } else if (userType.equals("PortManager")) {
-            // You might also need to specify which port the PortManager manages.
-            System.out.print("Enter managed port ID: ");
-            String managedPortId = scanner.nextLine();
-            // Note: Here, I'm assuming you have a method in PortController to get the port by ID.
-            PortController portController = new PortController();
-            Port managedPort = portController.getPortById(managedPortId);
-            newUser = new PortManager(username, password, managedPort);
-        } else {
-            System.out.println("Invalid user type!");
-            return;
-        }
+        PortManager newPortManager = new PortManager(username, password, managedPort);
 
-        List<User> usersList;
+        List<PortManager> managersList;
         try {
-            User[] usersArray = (User[]) dbHandler.readObjects(USER_FILE_PATH);
-            usersList = new ArrayList<>(Arrays.asList(usersArray));
+            PortManager[] managersArray = (PortManager[]) dbHandler.readObjects(USER_FILE_PATH);
+            managersList = new ArrayList<>(Arrays.asList(managersArray));
         } catch (Exception e) {
-            usersList = new ArrayList<>();
+            managersList = new ArrayList<>();
         }
 
-        usersList.add(newUser);
-        dbHandler.writeObjects(USER_FILE_PATH, usersList.toArray(new User[0]));
-        System.out.println(userType + " created successfully!");
+        managersList.add(newPortManager);
+        dbHandler.writeObjects(USER_FILE_PATH, managersList.toArray(new PortManager[0]));
+        System.out.println("PortManager created successfully!");
     }
 
     @Override
     public void displayOne() {
-        System.out.println("DISPLAY USER INFO");
+        System.out.println("DISPLAY PORT MANAGER INFO");
         System.out.print("Enter username: ");
         String usernameToDisplay = scanner.nextLine();
 
-        List<User> usersList;
+        List<PortManager> managersList;
         try {
-            User[] usersArray = (User[]) dbHandler.readObjects(USER_FILE_PATH);
-            usersList = new ArrayList<>(Arrays.asList(usersArray));
+            PortManager[] managersArray = (PortManager[]) dbHandler.readObjects(USER_FILE_PATH);
+            managersList = new ArrayList<>(Arrays.asList(managersArray));
         } catch (Exception e) {
-            System.out.println("Error reading users or no users exist.");
+            System.out.println("Error reading port managers or none exist.");
             return;
         }
 
-        User userToDisplay = null;
-        for (User user : usersList) {
-            if (user.getUsername().equals(usernameToDisplay)) {
-                userToDisplay = user;
+        PortManager managerToDisplay = null;
+        for (PortManager manager : managersList) {
+            if (manager.getUsername().equals(usernameToDisplay)) {
+                managerToDisplay = manager;
                 break;
             }
         }
 
-        if (userToDisplay != null) {
+        if (managerToDisplay != null) {
             System.out.println("--------------------------------------------");
-            System.out.printf("| %-15s | %-25s |\n", "Username", "User Type");
+            System.out.printf("| %-15s | %-25s |\n", "Username", "Managed Port ID");
             System.out.println("--------------------------------------------");
-            System.out.printf("| %-15s | %-25s |\n", userToDisplay.getUsername(), userToDisplay.getClass().getSimpleName());
+            System.out.printf("| %-15s | %-25s |\n", managerToDisplay.getUsername(), managerToDisplay.getManagedPort().getPortId());
             System.out.println("--------------------------------------------");
         } else {
-            System.out.println("No user found with the given username.");
+            System.out.println("No PortManager found with the given username.");
         }
     }
 
     @Override
     public void displayAll() {
-        System.out.println("DISPLAY ALL USERS INFO");
+        System.out.println("DISPLAY ALL PORT MANAGERS INFO");
 
-        List<User> usersList;
+        List<PortManager> managersList;
         try {
-            User[] usersArray = (User[]) dbHandler.readObjects(USER_FILE_PATH);
-            usersList = new ArrayList<>(Arrays.asList(usersArray));
+            PortManager[] managersArray = (PortManager[]) dbHandler.readObjects(USER_FILE_PATH);
+            managersList = new ArrayList<>(Arrays.asList(managersArray));
         } catch (Exception e) {
-            System.out.println("Error reading users or no users exist.");
+            System.out.println("Error reading port managers or none exist.");
             return;
         }
 
         System.out.println("--------------------------------------------");
-        System.out.printf("| %-15s | %-25s |\n", "Username", "User Type");
+        System.out.printf("| %-15s | %-25s |\n", "Username", "Managed Port ID");
         System.out.println("--------------------------------------------");
-        for (User user : usersList) {
-            System.out.printf("| %-15s | %-25s |\n", user.getUsername(), user.getClass().getSimpleName());
+        for (PortManager manager : managersList) {
+            System.out.printf("| %-15s | %-25s |\n", manager.getUsername(), manager.getManagedPort().getPortId());
         }
         System.out.println("--------------------------------------------");
     }
 
     @Override
     public void update() {
-        System.out.println("USER UPDATE WIZARD");
+        System.out.println("PORT MANAGER UPDATE WIZARD");
         System.out.print("Enter username to update: ");
         String usernameToUpdate = scanner.nextLine();
 
-        List<User> usersList;
+        List<PortManager> managersList;
         try {
-            User[] usersArray = (User[]) dbHandler.readObjects(USER_FILE_PATH);
-            usersList = new ArrayList<>(Arrays.asList(usersArray));
+            PortManager[] managersArray = (PortManager[]) dbHandler.readObjects(USER_FILE_PATH);
+            managersList = new ArrayList<>(Arrays.asList(managersArray));
         } catch (Exception e) {
-            System.out.println("Error reading users or no users exist.");
+            System.out.println("Error reading port managers or none exist.");
             return;
         }
 
-        User userToUpdate = null;
-        for (User user : usersList) {
-            if (user.getUsername().equals(usernameToUpdate)) {
-                userToUpdate = user;
+        PortManager managerToUpdate = null;
+        for (PortManager manager : managersList) {
+            if (manager.getUsername().equals(usernameToUpdate)) {
+                managerToUpdate = manager;
                 break;
             }
         }
 
-        if (userToUpdate != null) {
+        if (managerToUpdate != null) {
             System.out.print("Enter new password (leave blank to keep unchanged): ");
             String password = scanner.nextLine();
             if (!password.isEmpty()) {
-                userToUpdate.setPassword(password);
+                managerToUpdate.setPassword(password);
             }
 
-            dbHandler.writeObjects(USER_FILE_PATH, usersList.toArray(new User[0]));
-            System.out.println("User with username " + usernameToUpdate + " updated successfully.");
+            dbHandler.writeObjects(USER_FILE_PATH, managersList.toArray(new PortManager[0]));
+            System.out.println("PortManager with username " + usernameToUpdate + " updated successfully.");
         } else {
-            System.out.println("No user found with the given username.");
+            System.out.println("No PortManager found with the given username.");
         }
     }
 
     @Override
     public void delete() {
-        System.out.println("USER DELETE WIZARD");
+        System.out.println("PORT MANAGER DELETE WIZARD");
         System.out.print("Enter username to delete: ");
         String usernameToDelete = scanner.nextLine();
 
-        List<User> usersList;
+        List<PortManager> managersList;
         try {
-            User[] usersArray = (User[]) dbHandler.readObjects(USER_FILE_PATH);
-            usersList = new ArrayList<>(Arrays.asList(usersArray));
+            PortManager[] managersArray = (PortManager[]) dbHandler.readObjects(USER_FILE_PATH);
+            managersList = new ArrayList<>(Arrays.asList(managersArray));
         } catch (Exception e) {
-            System.out.println("Error reading users or no users exist.");
+            System.out.println("Error reading port managers or none exist.");
             return;
         }
 
         boolean isDeleted = false;
-        Iterator<User> iterator = usersList.iterator();
+        Iterator<PortManager> iterator = managersList.iterator();
         while (iterator.hasNext()) {
-            User user = iterator.next();
-            if (user.getUsername().equals(usernameToDelete)) {
+            PortManager manager = iterator.next();
+            if (manager.getUsername().equals(usernameToDelete)) {
                 iterator.remove();
                 isDeleted = true;
                 break;
@@ -175,10 +165,10 @@ public class UserController extends BaseController {
         }
 
         if (isDeleted) {
-            dbHandler.writeObjects(USER_FILE_PATH, usersList.toArray(new User[0]));
-            System.out.println("User with username " + usernameToDelete + " deleted successfully.");
+            dbHandler.writeObjects(USER_FILE_PATH, managersList.toArray(new PortManager[0]));
+            System.out.println("PortManager with username " + usernameToDelete + " deleted successfully.");
         } else {
-            System.out.println("No user found with the given username.");
+            System.out.println("No PortManager found with the given username.");
         }
     }
 
