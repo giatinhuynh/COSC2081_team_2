@@ -1,6 +1,6 @@
 package views.flow;
 
-import controllers.*;
+import services.*;
 import views.BaseView;
 
 public class AdminFlow extends BaseView {
