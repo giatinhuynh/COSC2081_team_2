@@ -4,6 +4,7 @@ import models.container.Container;
 import models.port.Port;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 public abstract class Vehicle implements Serializable {
@@ -23,6 +24,19 @@ public abstract class Vehicle implements Serializable {
         this.currentFuel = currentFuel;
         this.carryingCapacity = carryingCapacity;
         this.fuelCapacity = fuelCapacity;
+
+        this.containers = new ArrayList<>();
+    }
+
+    public Vehicle(String vehicleId, String name, double currentFuel, double carryingCapacity, double fuelCapacity, Port currentPort) {
+        this.vehicleId = vehicleId;
+        this.name = name;
+        this.currentPort = currentPort;
+        this.currentFuel = currentFuel;
+        this.carryingCapacity = carryingCapacity;
+        this.fuelCapacity = fuelCapacity;
+
+        this.containers = new ArrayList<>();
     }
 
     // Methods
