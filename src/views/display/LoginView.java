@@ -2,6 +2,9 @@ package views.display;
 
 import java.util.Scanner;
 import controllers.UserController;
+import models.user.PortManager;
+import models.user.SystemAdmin;
+import models.user.User;
 import views.flow.AdminFlow;
 import views.flow.PortManagerFlow;
 
@@ -19,12 +22,16 @@ public class LoginView {
         System.out.print("Password: ");
         String password = scanner.nextLine();
 
-        if (userController.loginValidation(username, password)) {
-            if (userController.adminValidation(username, password)) {
+        User loggedInUser = userController.loginValidation(username, password);
+
+        if (loggedInUser != null) {
+            utils.CurrentUser.setUser(loggedInUser);  // Set the logged in user
+
+            if (loggedInUser instanceof SystemAdmin) {
                 staticDisplay.loginSuccessful();
                 System.out.println("Welcome, System Admin!");
                 adminFlow.displayAdminMenu();
-            } else {
+            } else if (loggedInUser instanceof PortManager) {
                 staticDisplay.loginSuccessful();
                 System.out.println("Welcome, Port Manager!");
                 portManagerFlow.PortManagerMenu();
