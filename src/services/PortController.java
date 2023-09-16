@@ -87,9 +87,9 @@ public class PortController extends BaseController {
 
         if (portToDisplay != null) {
             System.out.println("--------------------------------------------------------------------------------------");
-            System.out.printf("| %-10s | %-20s | %-10s | %-10s | %-15s | %-15s |\n", "Port ID", "Name", "Latitude", "Longitude", "Storing Capacity", "Landing Ability");
+            System.out.printf("| %-10s | %-40s | %-10s | %-10s | %-20s | %-15s |\n", "Port ID", "Name", "Latitude", "Longitude", "Storing Capacity", "Landing Ability");
             System.out.println("--------------------------------------------------------------------------------------");
-            System.out.printf("| %-10s | %-20s | %-10.2f | %-10.2f | %-15.2f | %-15b |\n",
+            System.out.printf("| %-10s | %-40s | %-10.4f | %-10.4f | %,-20.2f | %-15b |\n",
                     portToDisplay.getPortId(), portToDisplay.getName(), portToDisplay.getLatitude(),
                     portToDisplay.getLongitude(), portToDisplay.getStoringCapacity(), portToDisplay.getLandingAbility());
             System.out.println("--------------------------------------------------------------------------------------");
@@ -105,10 +105,10 @@ public class PortController extends BaseController {
         List<Port> portsList = fetchPortsFromDatabase();
 
         System.out.println("--------------------------------------------------------------------------------------");
-        System.out.printf("| %-10s | %-20s | %-10s | %-10s | %-15s | %-15s |\n", "Port ID", "Name", "Latitude", "Longitude", "Storing Capacity", "Landing Ability");
+        System.out.printf("| %-10s | %-40s | %-10s | %-10s | %-20s | %-15s |\n", "Port ID", "Name", "Latitude", "Longitude", "Storing Capacity", "Landing Ability");
         System.out.println("--------------------------------------------------------------------------------------");
         for (Port port : portsList) {
-            System.out.printf("| %-10s | %-20s | %-10.2f | %-10.2f | %-15.2f | %-15b |\n",
+            System.out.printf("| %-10s | %-40s | %-10.4f | %-10.4f | %,-20.2f | %-15b |\n",
                     port.getPortId(), port.getName(), port.getLatitude(), port.getLongitude(),
                     port.getStoringCapacity(), port.getLandingAbility());
         }
