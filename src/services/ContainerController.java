@@ -101,13 +101,7 @@ public class ContainerController extends BaseController {
             return;
         }
 
-        System.out.println("--------------------------------------------------------------------------------------");
-        System.out.printf("| %-15s | %-20s | %-15s |\n", "Container ID","Container Type", "Weight");
-        System.out.println("--------------------------------------------------------------------------------------");
-        for (Container container : containerList) {
-            System.out.printf("| %-15s | %-20s | %-15.2f |\n", container.getContainerId(), container.getContainerType(), container.getWeight());
-        }
-        System.out.println("--------------------------------------------------------------------------------------");
+        displayContainers(containerList);
     }
 
     @Override
