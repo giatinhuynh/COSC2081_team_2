@@ -1,8 +1,19 @@
 package models.container;
 
+import models.port.Port;
+import models.vehicle.Vehicle;
+
 public class OpenSide extends Container {
     public OpenSide(String containerId, double weight) {
         super(containerId, weight);
+    }
+
+    public OpenSide(String containerId, double weight, Port currentPort) {
+        super(containerId, weight, currentPort);
+    }
+
+    public OpenSide(String containerId, double weight, Vehicle currentVehicle) {
+        super(containerId, weight, currentVehicle);
     }
 
     @Override
