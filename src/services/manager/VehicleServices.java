@@ -1,6 +1,6 @@
 package services.manager;
 
-import interfaces.manager.ManagerInterface;
+import interfaces.manager.ManagerVehicleInterface;
 import models.port.Port;
 import models.user.PortManager;
 import models.vehicle.Vehicle;
@@ -8,7 +8,7 @@ import utils.CurrentUser;
 
 import java.util.Scanner;
 
-public class VehicleServices extends BaseServices implements ManagerInterface {
+public class VehicleServices extends BaseServices implements ManagerVehicleInterface {
 
     private final Port managedPort;
     private final Scanner scanner = new Scanner(System.in);
