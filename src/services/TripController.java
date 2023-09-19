@@ -17,6 +17,7 @@ public class TripController extends BaseController {
     private final DatabaseHandler dbHandler = new DatabaseHandler();
     private SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm");
 
+
     @Override
     public void create() {
         System.out.println("TRIP CREATE WIZARD");
@@ -80,6 +81,41 @@ public class TripController extends BaseController {
 
         dbHandler.writeObjects(TRIP_FILE_PATH, tripsList.toArray(new Trip[0]));
         System.out.println("Trip created successfully!");
+    }
+
+    private String generateNextTripId() {
+        List<Trip> tripsList;
+        try {
+            Trip[] tripsArray = (Trip[]) dbHandler.readObjects(TRIP_FILE_PATH);
+            tripsList = new ArrayList<>(Arrays.asList(tripsArray));
+        } catch (Exception e) {
+            tripsList = new ArrayList<>();
+        }
+
+        if (tripsList.isEmpty()) {
+            return "T001"; // Starting ID
+        } else {
+            String lastTripId = tripsList.get(tripsList.size() - 1).getTripId();
+            int nextId = Integer.parseInt(lastTripId.substring(1)) + 1; // Assuming the ID format is "Txxx"
+            return String.format("T%03d", nextId); // This will format the ID as T001, T002, ...
+        }
+    }
+
+    public void createNewTrip(Vehicle vehicle, Port departurePort, Port arrivalPort, Date arrivalDate, Date departureDate, Trip.Status status) {
+        String tripId = generateNextTripId();
+        Trip newTrip = new Trip(tripId, vehicle, departurePort, arrivalPort, departureDate, arrivalDate, status);
+
+        List<Trip> tripsList;
+        try {
+            Trip[] tripsArray = (Trip[]) dbHandler.readObjects(TRIP_FILE_PATH);
+            tripsList = new ArrayList<>(Arrays.asList(tripsArray));
+        } catch (Exception e) {
+            tripsList = new ArrayList<>();
+        }
+
+        tripsList.add(newTrip);
+
+        dbHandler.writeObjects(TRIP_FILE_PATH, tripsList.toArray(new Trip[0]));
     }
 
     @Override
@@ -225,5 +261,28 @@ public class TripController extends BaseController {
         } else {
             System.out.println("No trip found with the given ID.");
         }
+    }
+
+    public boolean vehicleAvailCheck(Vehicle vehicle) {
+        List<Trip> tripsList;
+        try {
+            Trip[] tripsArray = (Trip[]) dbHandler.readObjects(TRIP_FILE_PATH);
+            tripsList = new ArrayList<>(Arrays.asList(tripsArray));
+        } catch (Exception e) {
+            System.out.println("Error reading trips or no trips exist.");
+            return false;
+        }
+
+        for (Trip trip : tripsList) {
+            if (trip.getVehicle().equals(vehicle)) {
+                if (trip.getStatus().equals("Completed")) {
+                    continue;
+                }
+                if (trip.getStatus().equals("In Transit")) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 }
