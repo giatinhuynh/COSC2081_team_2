@@ -1,4 +1,4 @@
-package services;
+package services.admin;
 
 import models.port.Port;
 import models.user.SystemAdmin;
@@ -9,7 +9,7 @@ import models.user.PortManager;
 
 import java.util.*;
 
-public class UserController extends BaseController {
+public class UserServicesAdmin extends AdminBaseServices {
 
     private final Scanner scanner = new Scanner(System.in);
     private final String USER_FILE_PATH = Constants.USER_FILE_PATH;
@@ -27,7 +27,7 @@ public class UserController extends BaseController {
 
         System.out.print("Enter managed port ID: ");
         String managedPortId = scanner.nextLine();
-        PortController portController = new PortController();
+        PortServicesAdmin portController = new PortServicesAdmin();
         Port managedPort = portController.getPortById(managedPortId);
 
         PortManager newPortManager = new PortManager(username, password, managedPort);

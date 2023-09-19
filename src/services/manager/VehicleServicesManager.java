@@ -6,9 +6,9 @@ import models.port.Port;
 import models.trip.Trip;
 import models.user.PortManager;
 import models.vehicle.Vehicle;
-import services.PortController;
-import services.TripController;
-import services.VehicleController;
+import services.admin.PortServicesAdmin;
+import services.admin.TripServicesAdmin;
+import services.admin.VehicleServicesAdmin;
 import utils.Constants;
 import utils.CurrentUser;
 import utils.DateUtils;
@@ -18,19 +18,19 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Scanner;
 
-public class VehicleServices extends BaseServices implements ManagerVehicleInterface {
+public class VehicleServicesManager extends ManagerBaseServices implements ManagerVehicleInterface {
 
     private final Port managedPort;
     private final Scanner scanner = new Scanner(System.in);
     private final String TRIP_FILE_PATH = Constants.TRIP_FILE_PATH;
     private final DatabaseHandler dbHandler = new DatabaseHandler();
     private SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm");
-    private final VehicleController vehicleController = new VehicleController();
-    private final PortController portController = new PortController();
-    private final TripController tripController = new TripController();
+    private final VehicleServicesAdmin vehicleController = new VehicleServicesAdmin();
+    private final PortServicesAdmin portController = new PortServicesAdmin();
+    private final TripServicesAdmin tripController = new TripServicesAdmin();
     private final DateUtils dateUtils = new DateUtils();
 
-    public VehicleServices() {
+    public VehicleServicesManager() {
         if (CurrentUser.getUser() instanceof PortManager) {
             this.managedPort = ((PortManager) CurrentUser.getUser()).getManagedPort();
         } else {

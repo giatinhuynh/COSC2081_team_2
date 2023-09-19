@@ -1,27 +1,28 @@
 package services.manager;
 
 import database.DatabaseHandler;
+import interfaces.CRUD.ContainerCRUD;
 import interfaces.manager.ManagerContainerInterface;
 import models.container.*;
 import models.port.Port;
 import models.user.PortManager;
 import models.vehicle.Ship;
 import models.vehicle.Vehicle;
-import services.PortController;
+import services.admin.PortServicesAdmin;
 import utils.Constants;
 import utils.CurrentUser;
 
 import java.util.*;
 
-public class ContainerServices extends BaseServices implements ManagerContainerInterface {
+public class ContainerServicesManager extends ManagerBaseServices implements ContainerCRUD, ManagerContainerInterface {
 
-    private final PortController portServices = new PortController();
+    private final PortServicesAdmin portServices = new PortServicesAdmin();
     private final Port managedPort;
     private final Scanner scanner = new Scanner(System.in);
     private final String CONTAINER_FILE_PATH = Constants.CONTAINER_FILE_PATH;
     private final DatabaseHandler dbHandler = new DatabaseHandler();
 
-    public ContainerServices() {
+    public ContainerServicesManager() {
         if (CurrentUser.getUser() instanceof PortManager) {
             this.managedPort = ((PortManager) CurrentUser.getUser()).getManagedPort();
         } else {
@@ -147,6 +148,7 @@ public class ContainerServices extends BaseServices implements ManagerContainerI
         dbHandler.writeObjects(CONTAINER_FILE_PATH, containerList.toArray(new Container[0]));
     }
 
+    @Override
     public void findContainer() {
         System.out.println("DISPLAY CONTAINER INFO");
         System.out.print("Enter container ID: ");
@@ -173,6 +175,7 @@ public class ContainerServices extends BaseServices implements ManagerContainerI
         }
     }
 
+    @Override
     public void displayAllContainers() {
         System.out.println("DISPLAY ALL CONTAINERS INFO");
 

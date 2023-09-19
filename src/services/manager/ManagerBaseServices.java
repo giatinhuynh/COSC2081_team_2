@@ -5,15 +5,15 @@ import models.container.Container;
 import models.port.Port;
 import models.user.PortManager;
 import models.vehicle.Vehicle;
-import services.PortController;
+import services.admin.PortServicesAdmin;
 import utils.CurrentUser;
 
-public abstract class BaseServices implements ManagerInterface {
+public abstract class ManagerBaseServices implements ManagerInterface {
 
-    private final PortController portServices = new PortController();
+    private final PortServicesAdmin portServices = new PortServicesAdmin();
     private final Port managedPort;
 
-    public BaseServices() {
+    public ManagerBaseServices() {
         if (CurrentUser.getUser() instanceof PortManager) {
             this.managedPort = ((PortManager) CurrentUser.getUser()).getManagedPort();
         } else {

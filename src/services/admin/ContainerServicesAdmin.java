@@ -1,22 +1,49 @@
-package services;
+package services.admin;
 
+import exceptions.InputValidation;
+import models.port.Port;
 import utils.Constants;
 import database.DatabaseHandler;
 import models.container.*;
+import interfaces.CRUD.ContainerCRUD;
 
 import java.util.*;
 
-public class ContainerController extends BaseController {
+public class ContainerServicesAdmin extends AdminBaseServices implements ContainerCRUD  {
 
     private final Scanner scanner = new Scanner(System.in);
     private final String CONTAINER_FILE_PATH = Constants.CONTAINER_FILE_PATH;
     private final DatabaseHandler dbHandler = new DatabaseHandler();
+    private final InputValidation inputValidation = new InputValidation();
+
+    // Modularized method to fetch containers from the database
+    private List<Container> fetchContainersFromDatabase() {
+        try {
+            Container[] containersArray = (Container[]) dbHandler.readObjects(CONTAINER_FILE_PATH);
+            return new ArrayList<>(Arrays.asList(containersArray));
+        } catch (Exception e) {  // Catching a generic exception as a placeholder.
+            System.out.println("Error reading containers or no containers exist.");
+            return new ArrayList<>();
+        }
+    }
+
+    // Modularized method to write containers to the database
+    private void writeContainersToDatabase(List<Container> containersList) {
+        dbHandler.writeObjects(CONTAINER_FILE_PATH, containersList.toArray(new Container[0]));
+    }
+
+    // Modularized method to find a container by its ID
+    private Optional<Container> findContainerById(String containerId) {
+        return fetchContainersFromDatabase().stream()
+                .filter(container -> container.getContainerId().equals(containerId))
+                .findFirst();
+    }
 
     @Override
-    public void create() {
+    public void createNewContainer() {
         System.out.println("CONTAINER CREATE WIZARD");
         System.out.print("Enter container ID: ");
-        String containerId = scanner.nextLine();
+        String containerId = inputValidation.idValidation("C-");
         System.out.print("Enter container weight: ");
         double weight = scanner.nextDouble();
         System.out.println("Select container type:");
@@ -41,47 +68,22 @@ public class ContainerController extends BaseController {
             }
         }
 
-        List<Container> containerList;
-        try {
-            Container[] containersArray = (Container[]) dbHandler.readObjects(CONTAINER_FILE_PATH);
-            containerList = new ArrayList<>(Arrays.asList(containersArray));
-        } catch (Exception e) {
-            containerList = new ArrayList<>();
-        }
-
+        List<Container> containerList = fetchContainersFromDatabase();
         containerList.add(newContainer);
-
-        dbHandler.writeObjects(CONTAINER_FILE_PATH, containerList.toArray(new Container[0]));
+        writeContainersToDatabase(containerList);
     }
 
     @Override
-    public void displayOne() {
+    public void findContainer() {
         System.out.println("DISPLAY CONTAINER INFO");
         System.out.print("Enter container ID: ");
-        String containerIdToDisplay = scanner.nextLine();
-
-        List<Container> containerList;
-        try {
-            Container[] containersArray = (Container[]) dbHandler.readObjects(CONTAINER_FILE_PATH);
-            containerList = new ArrayList<>(Arrays.asList(containersArray));
-        } catch (Exception e) {
-            System.out.println("Error reading containers or no containers exist.");
-            return;
-        }
-
-        Container containerToDisplay = null;
-        for (Container container : containerList) {
-            if (container.getContainerId().equals(containerIdToDisplay)) {
-                containerToDisplay = container;
-                break;
-            }
-        }
-
-        if (containerToDisplay != null) {
-            System.out.println("--------------------------------------------------------------------------------------");
-            System.out.printf("| %-15s | %-20s | %-15s |\n", "Container ID", "Container Type", "Weight");
-            System.out.println("--------------------------------------------------------------------------------------");
-            System.out.printf("| %-15s | %-20s | %-15.2f |\n", containerToDisplay.getContainerId(), containerToDisplay.getContainerType(), containerToDisplay.getWeight());
+        String containerIdToDisplay = inputValidation.idValidation("C-");
+        List<Container> containerList = fetchContainersFromDatabase();
+        Optional<Container> optionalContainer = findContainerById(containerIdToDisplay);
+        if (optionalContainer.isPresent()) {
+            Container containerToDisplay = optionalContainer.get();
+            displayContainerTableHeader();
+            displayContainerTableRow(containerToDisplay);
             System.out.println("--------------------------------------------------------------------------------------");
         } else {
             System.out.println("No container found with the given ID.");
@@ -89,35 +91,24 @@ public class ContainerController extends BaseController {
     }
 
     @Override
-    public void displayAll() {
+    public void displayAllContainers() {
         System.out.println("DISPLAY ALL CONTAINERS INFO");
 
-        List<Container> containerList;
-        try {
-            Container[] containersArray = (Container[]) dbHandler.readObjects(CONTAINER_FILE_PATH);
-            containerList = new ArrayList<>(Arrays.asList(containersArray));
-        } catch (Exception e) {
-            System.out.println("Error reading containers or no containers exist.");
-            return;
+        List<Container> containerList = fetchContainersFromDatabase();
+        displayContainerTableHeader();
+        for (Container container : containerList) {
+            displayContainerTableRow(container);
         }
-
-        displayContainers(containerList);
+        System.out.println("--------------------------------------------------------------------------------------");
     }
 
     @Override
-    public void update() {
+    public void updateContainer() {
         System.out.println("CONTAINER UPDATE WIZARD");
         System.out.print("Enter container ID to update: ");
-        String containerIdToUpdate = scanner.nextLine();
+        String containerIdToUpdate = inputValidation.idValidation("C-");
 
-        List<Container> containerList;
-        try {
-            Container[] containersArray = (Container[]) dbHandler.readObjects(CONTAINER_FILE_PATH);
-            containerList = new ArrayList<>(Arrays.asList(containersArray));
-        } catch (Exception e) {
-            System.out.println("Error reading containers or no containers exist.");
-            return;
-        }
+        List<Container> containerList = fetchContainersFromDatabase();
 
         Container containerToUpdate = null;
         int indexToUpdate = -1;  // new variable to keep track of the index in the list
@@ -170,7 +161,7 @@ public class ContainerController extends BaseController {
 
 
     @Override
-    public void delete() {
+    public void deleteContainer() {
         System.out.println("CONTAINER DELETE WIZARD");
         System.out.print("Enter container ID to delete: ");
         String containerIdToDelete = scanner.nextLine();
@@ -210,15 +201,5 @@ public class ContainerController extends BaseController {
             }
         }
         return null;
-    }
-
-    private void displayContainers(List<Container> containers) {
-        System.out.println("--------------------------------------------------------------------------------------");
-        System.out.printf("| %-15s | %-20s | %-15s |\n", "Container ID", "Container Type", "Weight");
-        System.out.println("--------------------------------------------------------------------------------------");
-        for (Container container : containers) {
-            System.out.printf("| %-15s | %-20s | %-15.2f |\n", container.getContainerId(), container.getContainerType(), container.getWeight());
-        }
-        System.out.println("--------------------------------------------------------------------------------------");
     }
 }

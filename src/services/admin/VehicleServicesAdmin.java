@@ -1,4 +1,4 @@
-package services;
+package services.admin;
 
 import utils.Constants;
 import database.DatabaseHandler;
@@ -8,12 +8,12 @@ import models.vehicle.Ship;
 
 import java.util.*;
 
-public class VehicleController extends BaseController {
+public class VehicleServicesAdmin extends AdminBaseServices {
 
     private final Scanner scanner = new Scanner(System.in);
     private final String VEHICLE_FILE_PATH = Constants.VEHICLE_FILE_PATH;
     private final DatabaseHandler dbHandler = new DatabaseHandler();
-    private final TripController tripController = new TripController();
+    private final TripServicesAdmin tripController = new TripServicesAdmin();
 
     @Override
     public void create() {

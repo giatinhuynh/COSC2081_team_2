@@ -1,4 +1,4 @@
-package services;
+package services.admin;
 
 import models.trip.Trip;
 import models.vehicle.Vehicle;
@@ -10,13 +10,23 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-public class TripController extends BaseController {
+public class TripServicesAdmin extends AdminBaseServices {
 
     private final Scanner scanner = new Scanner(System.in);
     private final String TRIP_FILE_PATH = Constants.TRIP_FILE_PATH;
     private final DatabaseHandler dbHandler = new DatabaseHandler();
     private SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm");
 
+    // Modularized method to fetch trips from the database
+    public List<Trip> fetchTripsFromDatabase() {
+        try {
+            Trip[] tripsArray = (Trip[]) dbHandler.readObjects(TRIP_FILE_PATH);
+            return new ArrayList<>(Arrays.asList(tripsArray));
+        } catch (Exception e) {  // Catching a generic exception as a placeholder.
+            System.out.println("Error reading trips or no trips exist.");
+            return new ArrayList<>();
+        }
+    }
 
     @Override
     public void create() {
@@ -25,8 +35,8 @@ public class TripController extends BaseController {
         System.out.print("Enter trip ID: ");
         String tripId = scanner.nextLine();
 
-        // Assuming VehicleController has a method to display all Vehicles for the user to choose from
-        VehicleController vehicleController = new VehicleController();
+        // Assuming VehicleServicesAdmin has a method to display all Vehicles for the user to choose from
+        VehicleServicesAdmin vehicleController = new VehicleServicesAdmin();
         vehicleController.displayAll(); // Display available vehicles
 
         System.out.print("Enter vehicle ID for the trip: ");
@@ -37,8 +47,8 @@ public class TripController extends BaseController {
             return;
         }
 
-        // Using PortController to display available Ports for departure and arrival
-        PortController portController = new PortController();
+        // Using PortServicesAdmin to display available Ports for departure and arrival
+        PortServicesAdmin portController = new PortServicesAdmin();
 
         portController.displayAll(); // Display all ports
         System.out.print("Enter departure port ID: ");

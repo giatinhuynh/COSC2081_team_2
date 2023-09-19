@@ -12,7 +12,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
-public class PortServices extends BaseServices implements ManagerPortInterface {
+public class PortServicesManager extends ManagerBaseServices implements ManagerPortInterface {
 
     private final Port managedPort;
     private final Scanner scanner = new Scanner(System.in);
@@ -30,7 +30,7 @@ public class PortServices extends BaseServices implements ManagerPortInterface {
         }
     }
 
-    public PortServices() {
+    public PortServicesManager() {
         if (CurrentUser.getUser() instanceof PortManager) {
             this.managedPort = ((PortManager) CurrentUser.getUser()).getManagedPort();
         } else {
