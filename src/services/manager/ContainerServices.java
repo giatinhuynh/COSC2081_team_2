@@ -29,7 +29,6 @@ public class ContainerServices extends BaseServices implements ManagerContainerI
         }
     }
 
-
     public void loadContainerFlow() {
         // Display all containers at the managed port
         System.out.println("Containers at your port:");
@@ -174,7 +173,7 @@ public class ContainerServices extends BaseServices implements ManagerContainerI
         }
     }
 
-    public void displayAllContainerInPort() {
+    public void displayAllContainers() {
         System.out.println("DISPLAY ALL CONTAINERS INFO");
 
         List<Container> containerList = managedPort.getCurrentContainers();
