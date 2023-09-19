@@ -3,7 +3,7 @@ package views.display;
 import models.user.PortManager;
 import models.user.SystemAdmin;
 import models.user.User;
-import services.UserController;
+import services.admin.UserServicesAdmin;
 import views.flow.AdminFlow;
 import views.flow.PortManagerFlow;
 
@@ -19,7 +19,7 @@ public class LoginView {
     private final Scanner scanner = new Scanner(System.in);
 
     // Controller to handle user-related operations.
-    private final UserController userController = new UserController();
+    private final UserServicesAdmin userController = new UserServicesAdmin();
 
     // Flow for admin users.
     private final AdminFlow adminFlow = new AdminFlow();

@@ -1,15 +1,15 @@
 package views.flow;
 
-import services.*;
+import services.admin.*;
 import views.BaseView;
 
 public class AdminFlow extends BaseView {
 
-    private final PortController adminPortController = new PortController();
-    private final VehicleController adminVehicleController = new VehicleController();
-    private final ContainerController adminContainerController = new ContainerController();
-    private final UserController adminUserController = new UserController();
-    private final TripController adminTripController = new TripController();
+    private final PortServicesAdmin adminPortController = new PortServicesAdmin();
+    private final VehicleServicesAdmin adminVehicleController = new VehicleServicesAdmin();
+    private final ContainerServicesAdmin adminContainerController = new ContainerServicesAdmin();
+    private final UserServicesAdmin adminUserController = new UserServicesAdmin();
+    private final TripServicesAdmin adminTripController = new TripServicesAdmin();
 
     public void displayAdminMenu() {
         displayMessage("=== ADMIN MENU ===");
@@ -49,23 +49,23 @@ public class AdminFlow extends BaseView {
         int choice = promptForInput("Enter your choice: ");
         switch (choice) {
             case 1 -> {
-                adminPortController.create();
+                adminPortController.createNewPort();
                 displayAdminPortsMenu();
             }
             case 2 -> {
-                adminPortController.update();
+                adminPortController.updatePort();
                 displayAdminPortsMenu();
             }
             case 3 -> {
-                adminPortController.delete();
+                adminPortController.deletePort();
                 displayAdminPortsMenu();
             }
             case 4 -> {
-                adminPortController.displayOne();
+                adminPortController.findPort();
                 displayAdminPortsMenu();
             }
             case 5 -> {
-                adminPortController.displayAll();
+                adminPortController.displayAllPorts();
                 displayAdminPortsMenu();
             }
             case 0 -> displayAdminMenu();
@@ -88,23 +88,23 @@ public class AdminFlow extends BaseView {
         int choice = promptForInput("Enter your choice: ");
         switch (choice) {
             case 1 -> {
-                adminContainerController.create();
+                adminContainerController.createNewContainer();
                 displayAdminContainersMenu();
             }
             case 2 -> {
-                adminContainerController.update();
+                adminContainerController.updateContainer();
                 displayAdminContainersMenu();
             }
             case 3 -> {
-                adminContainerController.delete();
+                adminContainerController.deleteContainer();
                 displayAdminContainersMenu();
             }
             case 4 -> {
-                adminContainerController.displayOne();
+                adminContainerController.findContainer();
                 displayAdminContainersMenu();
             }
             case 5 -> {
-                adminContainerController.displayAll();
+                adminContainerController.displayAllContainers();
                 displayAdminContainersMenu();
             }
             case 0 -> displayAdminMenu();

@@ -5,8 +5,8 @@ import services.manager.*;
 
 public class PortManagerFlow extends BaseView {
 
-    private final PortServices portServices = new PortServices();
-    private final ContainerServices containerServices = new ContainerServices();
+    private final PortServicesManager portServices = new PortServicesManager();
+    private final ContainerServicesManager containerServices = new ContainerServicesManager();
 
     public void PortManagerMenu() {
         displayMessage("=== PORT MANAGER MENU ===");
