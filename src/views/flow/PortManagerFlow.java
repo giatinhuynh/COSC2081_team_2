@@ -1,8 +1,12 @@
 package views.flow;
 
 import views.BaseView;
+import services.manager.*;
 
 public class PortManagerFlow extends BaseView {
+
+    private final PortServices portServices = new PortServices();
+    private final ContainerServices containerServices = new ContainerServices();
 
     public void PortManagerMenu() {
         displayMessage("=== PORT MANAGER MENU ===");
@@ -16,6 +20,9 @@ public class PortManagerFlow extends BaseView {
         int choice = promptForInput("Enter you choice: ");
         switch (choice) {
             case 1 -> PManagerContainerMenu();
+            case 2 -> PManagerVehicleMenu();
+            case 3 -> portServices.viewPortInfo();
+            case 4 -> portServices.updatePortInfo();
             case 0 -> logoutView();
             default -> {
                 displayMessage("Invalid choice. Please try again.");
@@ -38,8 +45,13 @@ public class PortManagerFlow extends BaseView {
 
         int choice = promptForInput("Enter you choice: ");
         switch (choice) {
-            case 1 -> PManagerLoadContainerMenu();
-            case 2 -> PManagerUnloadContainerMenu();
+            case 1 -> containerServices.loadContainerFlow();
+            case 2 -> containerServices.unloadContainerFlow();
+            case 3 -> containerServices.createNewContainer();
+            case 4 -> containerServices.updateContainer();
+            case 5 -> containerServices.deleteContainer();
+            case 6 -> containerServices.findContainer();
+            case 7 -> containerServices.displayAllContainers();
             case 0 -> PortManagerMenu();
             default -> {
                 displayMessage("Invalid choice. Please try again.");
@@ -48,13 +60,26 @@ public class PortManagerFlow extends BaseView {
         }
     }
 
-    public void PManagerLoadContainerMenu() {
-        displayMessage("=== PORT MANAGER LOAD CONTAINER MENU ===");
+    public void PManagerVehicleMenu() {
+        displayMessage("=== PORT MANAGER VEHICLE MENU ===");
+        displayMessage("1. Deploy Vehicle (Create Trip)");
+        displayMessage("2. Refuel Vehicle");
+        displayMessage("=================================");
+        displayMessage("3. Add Vehicle");
+        displayMessage("4. Update Vehicle");
+        displayMessage("5. Delete Vehicle");
+        displayMessage("6. Search Vehicle");
+        displayMessage("7. View All Vehicles");
+        displayMessage("0. Back");
 
-    }
-
-    public void PManagerUnloadContainerMenu() {
-
+        int choice = promptForInput("Enter you choice: ");
+        switch (choice) {
+            case 0 -> PortManagerMenu();
+            default -> {
+                displayMessage("Invalid choice. Please try again.");
+                PManagerVehicleMenu();
+            }
+        }
     }
 }
 
