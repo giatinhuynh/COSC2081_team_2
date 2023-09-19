@@ -107,6 +107,7 @@ public abstract class Vehicle implements Serializable {
     public void setCurrentPort(Port currentPort) {
         this.currentPort = currentPort;
     }
+
 }
 
 
