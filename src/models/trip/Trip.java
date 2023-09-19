@@ -15,7 +15,7 @@ public class Trip implements Serializable {
     private Date arrivalDate;               // Arrival date
     private Status status;                  // Current status (e.g., "In Transit", "Completed")
 
-    private enum Status {
+    public enum Status {
         LOADING, IN_TRANSIT, COMPLETED
     }
 
@@ -30,6 +30,20 @@ public class Trip implements Serializable {
         this.arrivalPort = arrivalPort;
         this.departureDate = new Date(departureDate.getTime());
         this.status = Status.LOADING;
+    }
+
+    public Trip(String tripId, Vehicle vehicle, Port departurePort, Port arrivalPort, Date departureDate, Date arrivalDate, Status status) {
+        if (tripId == null || vehicle == null || departurePort == null || arrivalPort == null || departureDate == null || arrivalDate == null || status == null) {
+            throw new IllegalArgumentException("Arguments cannot be null");
+        }
+
+        this.tripId = tripId;
+        this.vehicle = vehicle;
+        this.departurePort = departurePort;
+        this.arrivalPort = arrivalPort;
+        this.departureDate = new Date(departureDate.getTime());
+        this.arrivalDate = new Date(arrivalDate.getTime());
+        this.status = status;
     }
 
     public void completeTrip(Date arrivalDate) {
