@@ -13,6 +13,7 @@ public class VehicleController extends BaseController {
     private final Scanner scanner = new Scanner(System.in);
     private final String VEHICLE_FILE_PATH = Constants.VEHICLE_FILE_PATH;
     private final DatabaseHandler dbHandler = new DatabaseHandler();
+    private final TripController tripController = new TripController();
 
     @Override
     public void create() {
@@ -224,5 +225,28 @@ public class VehicleController extends BaseController {
             }
         }
         return vehicleToReturn;
+    }
+
+    public void displayIdleVehicles() {
+        List<Vehicle> vehicleList;
+        try {
+            Vehicle[] vehicleArray = (Vehicle[]) dbHandler.readObjects(Constants.VEHICLE_FILE_PATH);
+            vehicleList = new ArrayList<>(Arrays.asList(vehicleArray));
+        } catch (Exception e) {
+            System.out.println("Error reading vehicles or no vehicles exist.");
+            return;
+        }
+
+        System.out.println("------------------------------------------------------------------------------------------------------------------");
+        System.out.printf("| %-10s | %-20s | %-15s | %-20s | %-15s |\n", "Vehicle ID", "Name", "Current Fuel", "Carrying Capacity", "Fuel Capacity");
+        System.out.println("------------------------------------------------------------------------------------------------------------------");
+        for (Vehicle vehicle : vehicleList) {
+            if (tripController.vehicleAvailCheck(vehicle)) {
+                System.out.printf("| %-10s | %-20s | %-15.2f | %-20.2f | %-15.2f |\n",
+                        vehicle.getVehicleId(), vehicle.getName(), vehicle.getCurrentFuel(), vehicle.getCarryingCapacity(),
+                        vehicle.getFuelCapacity());
+            }
+        }
+        System.out.println("------------------------------------------------------------------------------------------------------------------");
     }
 }
