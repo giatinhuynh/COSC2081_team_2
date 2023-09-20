@@ -72,4 +72,8 @@ public class Truck extends Vehicle {
         );
         return distance / this.truckAvgSpeed;
     }
+
+    public String getType() {
+        return String.valueOf(type);
+    }
 }

@@ -108,6 +108,13 @@ public abstract class Vehicle implements Serializable {
         this.currentPort = currentPort;
     }
 
+    public String getVehicleStatus() {
+        if (this.currentPort == null) {
+            return "In transit";
+        } else {
+            return "In port";
+        }
+    }
 }
 
 

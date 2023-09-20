@@ -127,4 +127,9 @@ public class Trip implements Serializable {
     public double getFuelUsed() {
         return vehicle.calculateFuelNeeded(arrivalPort);
     }
+
+    public long getDuration() {
+        long differenceInMillis = arrivalDate.getTime() - departureDate.getTime();
+        return differenceInMillis / (1000 * 60 * 60 * 24);
+    }
 }
