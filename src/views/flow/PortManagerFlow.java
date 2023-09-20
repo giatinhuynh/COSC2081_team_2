@@ -2,14 +2,18 @@ package views.flow;
 
 import views.BaseView;
 import services.manager.*;
+import utils.UiUtils;
 
 public class PortManagerFlow extends BaseView {
 
     private final PortServicesManager portServices = new PortServicesManager();
     private final ContainerServicesManager containerServices = new ContainerServicesManager();
+    private final UiUtils uiUtils = new UiUtils();
 
     public void PortManagerMenu() {
-        displayMessage("=== PORT MANAGER MENU ===");
+        uiUtils.clearScreen();
+        System.out.println("Welcome, Port Manager!");
+        displayHeader("PORT MANAGER MENU");
         displayMessage("1. Manage Containers");
         displayMessage("2. Manage Vehicles");
         displayMessage("3. View Port Details");
@@ -23,6 +27,7 @@ public class PortManagerFlow extends BaseView {
             case 2 -> PManagerVehicleMenu();
             case 3 -> portServices.viewPortInfo();
             case 4 -> portServices.updatePortInfo();
+            case 5 -> PManagerStatisticsMenu();
             case 0 -> logoutView();
             default -> {
                 displayMessage("Invalid choice. Please try again.");
@@ -32,6 +37,7 @@ public class PortManagerFlow extends BaseView {
     }
 
     public void PManagerContainerMenu() {
+        uiUtils.clearScreen();
         displayMessage("=== PORT MANAGER CONTAINER MENU ===");
         displayMessage("1. Load Container");
         displayMessage("2. Unload Container");
@@ -61,6 +67,7 @@ public class PortManagerFlow extends BaseView {
     }
 
     public void PManagerVehicleMenu() {
+        uiUtils.clearScreen();
         displayMessage("=== PORT MANAGER VEHICLE MENU ===");
         displayMessage("1. Deploy Vehicle (Create Trip)");
         displayMessage("2. Refuel Vehicle");
@@ -78,6 +85,25 @@ public class PortManagerFlow extends BaseView {
             default -> {
                 displayMessage("Invalid choice. Please try again.");
                 PManagerVehicleMenu();
+            }
+        }
+    }
+
+    public void PManagerStatisticsMenu() {
+        uiUtils.clearScreen();
+        displayMessage("=== PORT MANAGER STATISTICS MENU ===");
+        displayMessage("1. Daily Fuel Usage");
+        displayMessage("2. Weight of each type of container");
+        displayMessage("3. List ships in a port");
+        displayMessage("4. List trips in a day");
+        displayMessage("0. Back");
+
+        int choice = promptForInput("Enter you choice: ");
+        switch (choice) {
+            case 0 -> PortManagerMenu();
+            default -> {
+                displayMessage("Invalid choice. Please try again.");
+                PManagerStatisticsMenu();
             }
         }
     }
