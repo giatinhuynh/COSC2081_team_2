@@ -38,6 +38,7 @@ public class VehicleServicesManager extends ManagerBaseServices implements Manag
         }
     }
 
+    @Override
     public void refuelVehicle() {
         // Display all vehicles at the managed port
         System.out.println("Vehicle at your port: ");
@@ -56,6 +57,7 @@ public class VehicleServicesManager extends ManagerBaseServices implements Manag
         System.out.println("Refuel successful!");
     }
 
+    @Override
     public void deployVehicle() throws ParseException {
         // Display all vehicles at the managed port
         System.out.println("Idle vehicles at your port: ");
