@@ -15,10 +15,36 @@
 
 package views;
 
+import java.io.IOException;
 import java.util.Scanner;
 
 public abstract class BaseView {
     protected Scanner scanner = new Scanner(System.in);
+
+    protected void displayHeader(String title) {
+        int width = 30;
+        int padding = (width - title.length()) / 2;
+        displayMessage("=".repeat(width));
+        displayMessage("=".repeat(padding) + title + "=".repeat(padding));
+        displayMessage("=".repeat(width));
+    }
+
+    protected void displayHorizontalLine() {
+        displayMessage("-".repeat(30));
+    }
+
+    protected void clearScreen() {
+        try {
+            if (System.getProperty("os.name").contains("Windows")) {
+                new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+            } else {
+                System.out.print("\033[H\033[2J");
+                System.out.flush();
+            }
+        } catch (IOException | InterruptedException ex) {
+            ex.printStackTrace();
+        }
+    }
 
     protected void displayMessage(String message) {
         System.out.println(message);
@@ -27,6 +53,12 @@ public abstract class BaseView {
     protected int promptForInput(String prompt) {
         System.out.print(prompt);
         return scanner.nextInt();
+    }
+
+    protected void backToMenu() {
+        System.out.println("Press anything to go back to menu");
+        scanner.nextLine();
+        scanner.nextLine();
     }
 
     protected void logoutView() {

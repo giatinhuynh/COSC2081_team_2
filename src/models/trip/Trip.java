@@ -123,4 +123,8 @@ public class Trip implements Serializable {
         }
         this.status = Status.valueOf(status);
     }
+
+    public double getFuelUsed() {
+        return vehicle.calculateFuelNeeded(arrivalPort);
+    }
 }

@@ -1,5 +1,6 @@
 package services.admin;
 
+import interfaces.CRUD.VehicleCRUD;
 import utils.Constants;
 import database.DatabaseHandler;
 import models.vehicle.Vehicle;
@@ -8,7 +9,7 @@ import models.vehicle.Ship;
 
 import java.util.*;
 
-public class VehicleServicesAdmin extends AdminBaseServices {
+public class VehicleServicesAdmin extends AdminBaseServices implements VehicleCRUD {
 
     private final Scanner scanner = new Scanner(System.in);
     private final String VEHICLE_FILE_PATH = Constants.VEHICLE_FILE_PATH;
@@ -16,7 +17,7 @@ public class VehicleServicesAdmin extends AdminBaseServices {
     private final TripServicesAdmin tripController = new TripServicesAdmin();
 
     @Override
-    public void create() {
+    public void createNewVehicle() {
         System.out.println("VEHICLE CREATE WIZARD");
         System.out.print("Enter vehicle ID: ");
         String vehicleId = scanner.nextLine();
@@ -55,7 +56,7 @@ public class VehicleServicesAdmin extends AdminBaseServices {
     }
 
     @Override
-    public void displayOne() {
+    public void findVehicle() {
         System.out.println("DISPLAY VEHICLE INFO");
         System.out.print("Enter vehicle ID: ");
         String vehicleIdToDisplay = scanner.nextLine();
@@ -91,7 +92,7 @@ public class VehicleServicesAdmin extends AdminBaseServices {
     }
 
     @Override
-    public void displayAll() {
+    public void displayAllVehicles() {
         System.out.println("DISPLAY ALL VEHICLES INFO");
 
         List<Vehicle> vehiclesList;
@@ -115,7 +116,7 @@ public class VehicleServicesAdmin extends AdminBaseServices {
     }
 
     @Override
-    public void update() {
+    public void updateVehicle() {
         System.out.println("VEHICLE UPDATE WIZARD");
         System.out.print("Enter vehicle ID to update: ");
         String vehicleIdToUpdate = scanner.nextLine();
@@ -174,7 +175,7 @@ public class VehicleServicesAdmin extends AdminBaseServices {
 
 
     @Override
-    public void delete() {
+    public void deleteVehicle() {
         System.out.println("VEHICLE DELETE WIZARD");
         System.out.print("Enter vehicle ID to delete: ");
         String vehicleIdToDelete = scanner.nextLine();

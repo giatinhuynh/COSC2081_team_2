@@ -49,7 +49,7 @@ public class ContainerServicesManager extends ManagerBaseServices implements Con
 
         // Show all ports except manager's port
         System.out.println("Available destination ports:");
-        portServices.displayAll();
+        portServices.displayAllPorts();
 
         // Get input for destination port
         System.out.println("Enter the destination port ID:");

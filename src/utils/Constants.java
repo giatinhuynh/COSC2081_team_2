@@ -1,32 +1,28 @@
-/*
-  RMIT University Vietnam
-  Course: COSC2081 Programming 1
-  Semester: 2023B
-  Assessment: Group Assignment
-  Group: Team Hi
-  Members:
-  Phan Nhat Minh - s3978598
-  Huynh Duc Gia Tin - s3818078
-  Nguyen Viet Ha - s3978128
-  Vu Minh Ha - s3978681
-  Created  date: 02/09/2023
-  Acknowledgement: chat.openai.com, stackoverflow.com, geeksforgeeks.org, javatpoint.com, tutorialspoint.com, oracle.com, w3schools.com, github.com
-*/
 package utils;
 
 import java.io.File;
+import java.net.URISyntaxException;
 import java.util.Date;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
-/**
- * Utility class that defines constants for the application.
- * This class provides constants related to file paths and a system date.
- */
 public class Constants {
 
-    // Root directory for serialized files
-    private static final String ROOT_DIR = "src" + File.separator + "database" + File.separator + "data" + File.separator;
+    // Determine the root directory based on the location of the Constants class file
+    private static final String ROOT_DIR;
+    static {
+        try {
+            File classDir = new File(Constants.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
+            String potentialRoot = classDir.getParentFile().getParentFile().getParentFile().getParent() + File.separator;
+            if (new File(potentialRoot, "src").exists()) {
+                ROOT_DIR = potentialRoot + "src" + File.separator + "database" + File.separator + "data" + File.separator;
+            } else {
+                ROOT_DIR = classDir.getParentFile().getParentFile().getParentFile() + File.separator + "src" + File.separator + "database" + File.separator + "data" + File.separator;
+            }
+        } catch (URISyntaxException e) {
+            throw new RuntimeException("Failed to determine root directory", e);
+        }
+    }
 
     // File names for serialized data
     private static final String CONTAINER_FILE = "containers.ser";
@@ -45,12 +41,6 @@ public class Constants {
     // Represents the system's starting date
     public static final Date SYSTEM_DATE = initializeSystemDate();
 
-    /**
-     * Initializes the SYSTEM_DATE constant.
-     *
-     * @return The system's starting date.
-     * @throws RuntimeException if there's an error parsing the date.
-     */
     private static Date initializeSystemDate() {
         try {
             return new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").parse("2020/01/01 00:00:00");
@@ -59,4 +49,3 @@ public class Constants {
         }
     }
 }
-

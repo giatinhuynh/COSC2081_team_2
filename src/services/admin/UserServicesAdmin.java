@@ -1,5 +1,6 @@
 package services.admin;
 
+import interfaces.CRUD.UserCRUD;
 import models.port.Port;
 import models.user.SystemAdmin;
 import utils.Constants;
@@ -9,14 +10,14 @@ import models.user.PortManager;
 
 import java.util.*;
 
-public class UserServicesAdmin extends AdminBaseServices {
+public class UserServicesAdmin extends AdminBaseServices implements UserCRUD {
 
     private final Scanner scanner = new Scanner(System.in);
     private final String USER_FILE_PATH = Constants.USER_FILE_PATH;
     private final DatabaseHandler dbHandler = new DatabaseHandler();
 
     @Override
-    public void create() {
+    public void createNewUser() {
         System.out.println("PORT MANAGER CREATE WIZARD");
 
         System.out.print("Enter username: ");
@@ -46,7 +47,7 @@ public class UserServicesAdmin extends AdminBaseServices {
     }
 
     @Override
-    public void displayOne() {
+    public void findUser() {
         System.out.println("DISPLAY PORT MANAGER INFO");
         System.out.print("Enter username: ");
         String usernameToDisplay = scanner.nextLine();
@@ -80,7 +81,7 @@ public class UserServicesAdmin extends AdminBaseServices {
     }
 
     @Override
-    public void displayAll() {
+    public void displayAllUsers() {
         System.out.println("DISPLAY ALL PORT MANAGERS INFO");
 
         List<PortManager> managersList;
@@ -102,7 +103,7 @@ public class UserServicesAdmin extends AdminBaseServices {
     }
 
     @Override
-    public void update() {
+    public void updateUser() {
         System.out.println("PORT MANAGER UPDATE WIZARD");
         System.out.print("Enter username to update: ");
         String usernameToUpdate = scanner.nextLine();
@@ -139,7 +140,7 @@ public class UserServicesAdmin extends AdminBaseServices {
     }
 
     @Override
-    public void delete() {
+    public void deleteUser() {
         System.out.println("PORT MANAGER DELETE WIZARD");
         System.out.print("Enter username to delete: ");
         String usernameToDelete = scanner.nextLine();

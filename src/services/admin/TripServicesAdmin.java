@@ -1,5 +1,6 @@
 package services.admin;
 
+import interfaces.CRUD.TripCRUD;
 import models.trip.Trip;
 import models.vehicle.Vehicle;
 import utils.Constants;
@@ -10,7 +11,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-public class TripServicesAdmin extends AdminBaseServices {
+public class TripServicesAdmin extends AdminBaseServices implements TripCRUD {
 
     private final Scanner scanner = new Scanner(System.in);
     private final String TRIP_FILE_PATH = Constants.TRIP_FILE_PATH;
@@ -29,7 +30,7 @@ public class TripServicesAdmin extends AdminBaseServices {
     }
 
     @Override
-    public void create() {
+    public void createTrip() {
         System.out.println("TRIP CREATE WIZARD");
 
         System.out.print("Enter trip ID: ");
@@ -37,7 +38,7 @@ public class TripServicesAdmin extends AdminBaseServices {
 
         // Assuming VehicleServicesAdmin has a method to display all Vehicles for the user to choose from
         VehicleServicesAdmin vehicleController = new VehicleServicesAdmin();
-        vehicleController.displayAll(); // Display available vehicles
+        vehicleController.displayAllVehicles(); // Display available vehicles
 
         System.out.print("Enter vehicle ID for the trip: ");
         String vehicleId = scanner.nextLine();
@@ -50,7 +51,7 @@ public class TripServicesAdmin extends AdminBaseServices {
         // Using PortServicesAdmin to display available Ports for departure and arrival
         PortServicesAdmin portController = new PortServicesAdmin();
 
-        portController.displayAll(); // Display all ports
+        portController.displayAllPorts(); // Display all ports
         System.out.print("Enter departure port ID: ");
         String departurePortId = scanner.nextLine();
         Port departurePort = portController.getPortById(departurePortId);
@@ -129,7 +130,7 @@ public class TripServicesAdmin extends AdminBaseServices {
     }
 
     @Override
-    public void displayOne() {
+    public void findTrip() {
         System.out.println("DISPLAY TRIP INFO");
         System.out.print("Enter trip ID: ");
         String tripIdToDisplay = scanner.nextLine();
@@ -167,7 +168,7 @@ public class TripServicesAdmin extends AdminBaseServices {
     }
 
     @Override
-    public void displayAll() {
+    public void displayAllTrips() {
         System.out.println("DISPLAY ALL TRIPS INFO");
 
         List<Trip> tripsList;
@@ -193,7 +194,7 @@ public class TripServicesAdmin extends AdminBaseServices {
     }
 
     @Override
-    public void update() {
+    public void updateTrip() {
         System.out.println("TRIP UPDATE WIZARD");
         System.out.print("Enter trip ID to update: ");
         String tripIdToUpdate = scanner.nextLine();
@@ -242,7 +243,7 @@ public class TripServicesAdmin extends AdminBaseServices {
     }
 
     @Override
-    public void delete() {
+    public void deleteTrip() {
         System.out.println("DELETE TRIP");
         System.out.print("Enter trip ID to delete: ");
         String tripIdToDelete = scanner.nextLine();

@@ -17,7 +17,7 @@ public class ContainerServicesAdmin extends AdminBaseServices implements Contain
     private final InputValidation inputValidation = new InputValidation();
 
     // Modularized method to fetch containers from the database
-    private List<Container> fetchContainersFromDatabase() {
+    public List<Container> fetchContainersFromDatabase() {
         try {
             Container[] containersArray = (Container[]) dbHandler.readObjects(CONTAINER_FILE_PATH);
             return new ArrayList<>(Arrays.asList(containersArray));

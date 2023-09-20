@@ -12,7 +12,8 @@ public class AdminFlow extends BaseView {
     private final TripServicesAdmin adminTripController = new TripServicesAdmin();
 
     public void displayAdminMenu() {
-        displayMessage("=== ADMIN MENU ===");
+        clearScreen(); // Clear the screen for a fresh view. This method needs to be implemented.
+        displayHeader("ADMIN MENU");
         displayMessage("1. Manage Ports");
         displayMessage("2. Manage Containers");
         displayMessage("3. Manage Vehicles");
@@ -20,8 +21,8 @@ public class AdminFlow extends BaseView {
         displayMessage("5. Manage Trips");
         displayMessage("6. Statistics");
         displayMessage("0. Logout");
-
-        int choice = promptForInput("Enter your choice: ");
+        displayHorizontalLine();
+        int choice = promptForInput("Enter your choice (0-6): ");
         switch (choice) {
             case 1 -> displayAdminPortsMenu();
             case 2 -> displayAdminContainersMenu();
@@ -38,46 +39,54 @@ public class AdminFlow extends BaseView {
     }
 
     public void displayAdminPortsMenu() {
-        displayMessage("=== ADMIN PORTS MENU ===");
+        clearScreen();
+        displayHeader("ADMIN PORTS MENU");
         displayMessage("1. Add Port");
         displayMessage("2. Update Port");
         displayMessage("3. Delete Port");
         displayMessage("4. Search Port");
         displayMessage("5. View All Ports");
         displayMessage("0. Back");
-
-        int choice = promptForInput("Enter your choice: ");
+        displayHorizontalLine();
+        int choice = promptForInput("Enter your choice (0-5): ");
         switch (choice) {
             case 1 -> {
                 adminPortController.createNewPort();
+                backToMenu();
                 displayAdminPortsMenu();
             }
             case 2 -> {
                 adminPortController.updatePort();
+                backToMenu();
                 displayAdminPortsMenu();
             }
             case 3 -> {
                 adminPortController.deletePort();
+                backToMenu();
                 displayAdminPortsMenu();
             }
             case 4 -> {
                 adminPortController.findPort();
+                backToMenu();
                 displayAdminPortsMenu();
             }
             case 5 -> {
                 adminPortController.displayAllPorts();
+                backToMenu();
                 displayAdminPortsMenu();
             }
             case 0 -> displayAdminMenu();
             default -> {
                 displayMessage("Invalid choice. Please try again.");
+                backToMenu();
                 displayAdminPortsMenu();
             }
         }
     }
 
     public void displayAdminContainersMenu() {
-        displayMessage("=== ADMIN CONTAINERS MENU ===");
+        clearScreen();
+        displayHeader("ADMIN CONTAINERS MENU");
         displayMessage("1. Add Container");
         displayMessage("2. Update Container");
         displayMessage("3. Delete Container");
@@ -89,27 +98,33 @@ public class AdminFlow extends BaseView {
         switch (choice) {
             case 1 -> {
                 adminContainerController.createNewContainer();
+                backToMenu();
                 displayAdminContainersMenu();
             }
             case 2 -> {
                 adminContainerController.updateContainer();
+                backToMenu();
                 displayAdminContainersMenu();
             }
             case 3 -> {
                 adminContainerController.deleteContainer();
+                backToMenu();
                 displayAdminContainersMenu();
             }
             case 4 -> {
                 adminContainerController.findContainer();
+                backToMenu();
                 displayAdminContainersMenu();
             }
             case 5 -> {
                 adminContainerController.displayAllContainers();
+                backToMenu();
                 displayAdminContainersMenu();
             }
             case 0 -> displayAdminMenu();
             default -> {
                 displayMessage("Invalid choice. Please try again.");
+                backToMenu();
                 displayAdminContainersMenu();
             }
         }
@@ -117,7 +132,8 @@ public class AdminFlow extends BaseView {
     }
 
     public void displayAdminVehiclesMenu() {
-        displayMessage("=== ADMIN VEHICLES MENU ===");
+        clearScreen();
+        displayHeader("ADMIN VEHICLES MENU");
         displayMessage("1. Add Vehicle");
         displayMessage("2. Update Vehicle");
         displayMessage("3. Delete Vehicle");
@@ -128,35 +144,42 @@ public class AdminFlow extends BaseView {
         int choice = promptForInput("Enter your choice: ");
         switch (choice) {
             case 1 -> {
-                adminVehicleController.create();
+                adminVehicleController.createNewVehicle();
+                backToMenu();
                 displayAdminVehiclesMenu();
             }
             case 2 -> {
-                adminVehicleController.update();
+                adminVehicleController.updateVehicle();
+                backToMenu();
                 displayAdminVehiclesMenu();
             }
             case 3 -> {
-                adminVehicleController.delete();
+                adminVehicleController.deleteVehicle();
+                backToMenu();
                 displayAdminVehiclesMenu();
             }
             case 4 -> {
-                adminVehicleController.displayOne();
+                adminVehicleController.findVehicle();
+                backToMenu();
                 displayAdminVehiclesMenu();
             }
             case 5 -> {
-                adminVehicleController.displayAll();
+                adminVehicleController.displayAllVehicles();
+                backToMenu();
                 displayAdminVehiclesMenu();
             }
             case 0 -> displayAdminMenu();
             default -> {
                 displayMessage("Invalid choice. Please try again.");
+                backToMenu();
                 displayAdminVehiclesMenu();
             }
         }
     }
 
     public void displayAdminUsersMenu() {
-        displayMessage("=== ADMIN PORT MANAGERS MENU ===");
+        clearScreen();
+        displayHeader("ADMIN USERS MENU");
         displayMessage("1. Add Port Manager");
         displayMessage("2. Update Port Manager");
         displayMessage("3. Delete Port Manager");
@@ -167,23 +190,28 @@ public class AdminFlow extends BaseView {
         int choice = promptForInput("Enter your choice: ");
         switch (choice) {
             case 1 -> {
-                adminUserController.create();
+                adminUserController.createNewUser();
+                backToMenu();
                 displayAdminUsersMenu();
             }
             case 2 -> {
-                adminUserController.update();
+                adminUserController.updateUser();
+                backToMenu();
                 displayAdminUsersMenu();
             }
             case 3 -> {
-                adminUserController.delete();
+                adminUserController.deleteUser();
+                backToMenu();
                 displayAdminUsersMenu();
             }
             case 4 -> {
-                adminUserController.displayOne();
+                adminUserController.findUser();
+                backToMenu();
                 displayAdminUsersMenu();
             }
             case 5 -> {
-                adminUserController.displayAll();
+                adminUserController.displayAllUsers();
+                backToMenu();
                 displayAdminUsersMenu();
             }
             case 0 -> displayAdminMenu();
@@ -195,7 +223,8 @@ public class AdminFlow extends BaseView {
     }
 
     public void displayAdminTripsMenu() {
-        displayMessage("=== ADMIN TRIPS MENU ===");
+        clearScreen();
+        displayHeader("ADMIN TRIPS MENU");
         displayMessage("1. Add Trip");
         displayMessage("2. Update Trip");
         displayMessage("3. Delete Trip");
@@ -206,35 +235,47 @@ public class AdminFlow extends BaseView {
         int choice = promptForInput("Enter your choice: ");
         switch (choice) {
             case 1 -> {
-                adminTripController.create();
+                adminTripController.createTrip();
+                backToMenu();
                 displayAdminTripsMenu();
             }
             case 2 -> {
-                adminTripController.update();
+                adminTripController.updateTrip();
+                backToMenu();
                 displayAdminTripsMenu();
             }
             case 3 -> {
-                adminTripController.delete();
+                adminTripController.deleteTrip();
+                backToMenu();
                 displayAdminTripsMenu();
             }
             case 4 -> {
-                adminTripController.displayOne();
+                adminTripController.findTrip();
+                backToMenu();
                 displayAdminTripsMenu();
             }
             case 5 -> {
-                adminTripController.displayAll();
+                adminTripController.displayAllTrips();
+                backToMenu();
                 displayAdminTripsMenu();
             }
             case 0 -> displayAdminMenu();
             default -> {
                 displayMessage("Invalid choice. Please try again");
+                backToMenu();
                 displayAdminTripsMenu();
             }
         }
     }
 
     public void displayAdminStatisticsMenu () {
-
+        clearScreen();
+        displayHeader("ADMIN STATISTICS MENU");
+        displayMessage("1. View Port Statistics");
+        displayMessage("2. View Container Statistics");
+        displayMessage("3. View Vehicle Statistics");
+        displayMessage("4. View Trip Statistics");
+        displayMessage("0. Back");
     }
 }
 

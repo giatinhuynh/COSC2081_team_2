@@ -80,6 +80,20 @@ public abstract class Container implements Serializable {
         return null;
     }
 
+    public String getContainerStatus() {
+        if (location instanceof Port) {
+            return "Awaiting loading";
+        } else if (location instanceof Vehicle) {
+            if (((Vehicle) location).getCurrentPort() != null) {
+                return "Loaded";
+            } else {
+                return "In transit";
+            }
+        } else {
+            return "Unoccupied";
+        }
+    }
+
     public void setCurrentPort(Port currentPort) {
         this.location = currentPort;
     }
