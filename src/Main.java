@@ -34,14 +34,8 @@ public class Main {
      * @param args Command line arguments (not used in this application).
      */
     public static void main(String[] args) {
-        // Display a screen break for better visual separation.
-        staticDisplay.screenBreak();
-
         // Display the assessment information.
         staticDisplay.displayAssessmentInfo();
-
-        // Another screen break for visual separation.
-        staticDisplay.screenBreak();
 
         // Display the login view to the user.
         loginView.displayLoginView();
