@@ -4,16 +4,19 @@ import models.user.PortManager;
 import models.user.SystemAdmin;
 import models.user.User;
 import services.admin.UserServicesAdmin;
+import views.BaseView;
 import views.flow.AdminFlow;
 import views.flow.PortManagerFlow;
+import utils.UiUtils;
 
+import java.io.Console;
 import java.util.Scanner;
 
 /**
  * Represents the login view of the application.
  * This class is responsible for capturing user input for login and directing the user to the appropriate view based on their role.
  */
-public class LoginView {
+public class LoginView extends BaseView {
 
     // Scanner instance to capture user input.
     private final Scanner scanner = new Scanner(System.in);
@@ -29,6 +32,8 @@ public class LoginView {
 
     // Static display instance to show static messages.
     private final StaticDisplay staticDisplay = new StaticDisplay();
+
+    private final UiUtils uiUtils = new UiUtils();
 
     /**
      * Lazy initialization for the PortManagerFlow instance.
@@ -46,33 +51,51 @@ public class LoginView {
      * Displays the login view, captures user input, and directs the user to the appropriate view based on their role.
      */
     public void displayLoginView() {
-        System.out.println("=== LOGIN ===");
+        uiUtils.clearScreen();
+        printSeparator(30);
+        printCentered("LOGIN", 30);
+        printSeparator(30);
+
         System.out.print("Username: ");
         String username = scanner.nextLine();
+
         System.out.print("Password: ");
-        String password = scanner.nextLine();
+        String password = readPassword();
 
         // Validate the user's credentials.
         User loggedInUser = userController.loginValidation(username, password);
+
+        printSeparator(30);
 
         if (loggedInUser != null) {
             // Set the current logged-in user.
             utils.CurrentUser.setUser(loggedInUser);
 
+            // Display login successful message
+            staticDisplay.loginSuccessful();
+
             // Direct the user to the appropriate view based on their role.
             if (loggedInUser instanceof SystemAdmin) {
-                staticDisplay.loginSuccessful();
-                System.out.println("Welcome, System Admin!");
                 adminFlow.displayAdminMenu();
             } else if (loggedInUser instanceof PortManager) {
-                staticDisplay.loginSuccessful();
-                System.out.println("Welcome, Port Manager!");
                 getPortManagerFlow().PortManagerMenu();  // Use the getter method for lazy initialization
             }
         } else {
             // Display login failure messages.
             staticDisplay.loginFailed();
             staticDisplay.thankYou();
+        }
+        printSeparator(30);
+    }
+
+    private String readPassword() {
+        Console console = System.console();
+        if (console != null) {
+            char[] passwordChars = console.readPassword();
+            return new String(passwordChars);
+        } else {
+            // Fallback to Scanner if Console is not available (e.g., inside an IDE)
+            return scanner.nextLine();
         }
     }
 }
