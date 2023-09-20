@@ -126,4 +126,12 @@ public class Port implements Serializable {
     public void removeContainer(Container container) {
         this.currentContainers.remove(container);
     }
+
+    public double getOccupiedCapacity() {
+        double occupiedCapacity = 0;
+        for (Container container : this.currentContainers) {
+            occupiedCapacity += container.getWeight();
+        }
+        return occupiedCapacity;
+    }
 }
