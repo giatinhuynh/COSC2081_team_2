@@ -6,6 +6,7 @@ import database.DatabaseHandler;
 import models.vehicle.Vehicle;
 import models.vehicle.Truck;
 import models.vehicle.Ship;
+import exceptions.InputValidation;
 
 import java.util.*;
 
@@ -15,6 +16,18 @@ public class VehicleServicesAdmin extends AdminBaseServices implements VehicleCR
     private final String VEHICLE_FILE_PATH = Constants.VEHICLE_FILE_PATH;
     private final DatabaseHandler dbHandler = new DatabaseHandler();
     private final TripServicesAdmin tripController = new TripServicesAdmin();
+    private final InputValidation idValidation = new InputValidation();
+
+    public List<Vehicle> fetchVehiclesFromDatabase() {
+        List<Vehicle> vehiclesList;
+        try {
+            Vehicle[] vehiclesArray = (Vehicle[]) dbHandler.readObjects(VEHICLE_FILE_PATH);
+            vehiclesList = new ArrayList<>(Arrays.asList(vehiclesArray));
+        } catch (Exception e) {
+            vehiclesList = new ArrayList<>();
+        }
+        return vehiclesList;
+    }
 
     @Override
     public void createNewVehicle() {
@@ -43,32 +56,18 @@ public class VehicleServicesAdmin extends AdminBaseServices implements VehicleCR
             newVehicle = new Ship(vehicleId, name, currentFuel, carryingCapacity, fuelCapacity);
         }
 
-        List<Vehicle> vehiclesList;
-        try {
-            Vehicle[] vehiclesArray = (Vehicle[]) dbHandler.readObjects(VEHICLE_FILE_PATH);
-            vehiclesList = new ArrayList<>(Arrays.asList(vehiclesArray));
-        } catch (Exception e) {
-            vehiclesList = new ArrayList<>();
-        }
-
+        List<Vehicle> vehiclesList = fetchVehiclesFromDatabase();
         vehiclesList.add(newVehicle);
         dbHandler.writeObjects(VEHICLE_FILE_PATH, vehiclesList.toArray(new Vehicle[0]));
     }
 
     @Override
     public void findVehicle() {
-        System.out.println("DISPLAY VEHICLE INFO");
+        System.out.println("FIND VEHICLE");
         System.out.print("Enter vehicle ID: ");
-        String vehicleIdToDisplay = scanner.nextLine();
+        String vehicleIdToDisplay = idValidation.idValidation("V");
 
-        List<Vehicle> vehiclesList;
-        try {
-            Vehicle[] vehiclesArray = (Vehicle[]) dbHandler.readObjects(VEHICLE_FILE_PATH);
-            vehiclesList = new ArrayList<>(Arrays.asList(vehiclesArray));
-        } catch (Exception e) {
-            System.out.println("Error reading vehicles or no vehicles exist.");
-            return;
-        }
+        List<Vehicle> vehiclesList = fetchVehiclesFromDatabase();
 
         Vehicle vehicleToDisplay = null;
         for (Vehicle vehicle : vehiclesList) {
@@ -78,14 +77,24 @@ public class VehicleServicesAdmin extends AdminBaseServices implements VehicleCR
             }
         }
 
+        int tableWidth = 10 + 20 + 20 + 25 + 20 + 16; // column widths + 6 borders (3 on left and 3 on right)
+
         if (vehicleToDisplay != null) {
-            System.out.println("------------------------------------------------------------------------------------------------------------------");
-            System.out.printf("| %-10s | %-20s | %-15s | %-20s | %-15s |\n", "Vehicle ID", "Name", "Current Fuel", "Carrying Capacity", "Fuel Capacity");
-            System.out.println("------------------------------------------------------------------------------------------------------------------");
-            System.out.printf("| %-10s | %-20s | %-15.2f | %-20.2f | %-15.2f |\n",
+            printTopBorderWithCenteredTitle(tableWidth, "VEHICLE INFORMATION");
+
+            // Print the header row
+            System.out.printf("| %-10s | %-20s | %-20s | %-25s | %-20s |\n", "Vehicle ID", "Licensed Plate", "Current Fuel", "Carrying Capacity", "Fuel Capacity");
+
+            // Print the separator between header and data rows
+            printBorder(tableWidth);
+
+            // Print the data row
+            System.out.printf("| %-10s | %-20s | %-20.2f | %-25.2f | %-20.2f |\n",
                     vehicleToDisplay.getVehicleId(), vehicleToDisplay.getName(), vehicleToDisplay.getCurrentFuel(),
                     vehicleToDisplay.getCarryingCapacity(), vehicleToDisplay.getFuelCapacity());
-            System.out.println("------------------------------------------------------------------------------------------------------------------");
+
+            // Print the bottom border of the table
+            printBorder(tableWidth);
         } else {
             System.out.println("No vehicle found with the given ID.");
         }
@@ -93,27 +102,66 @@ public class VehicleServicesAdmin extends AdminBaseServices implements VehicleCR
 
     @Override
     public void displayAllVehicles() {
-        System.out.println("DISPLAY ALL VEHICLES INFO");
+        List<Vehicle> vehiclesList = fetchVehiclesFromDatabase();
 
-        List<Vehicle> vehiclesList;
-        try {
-            Vehicle[] vehiclesArray = (Vehicle[]) dbHandler.readObjects(VEHICLE_FILE_PATH);
-            vehiclesList = new ArrayList<>(Arrays.asList(vehiclesArray));
-        } catch (Exception e) {
-            System.out.println("Error reading vehicles or no vehicles exist.");
-            return;
-        }
+        // Adjust the table width for the new columns
+        int tableWidth = 15 + 20 + 20 + 25 + 20 + 16 + 15 + 15; // column widths + 8 borders (4 on left and 4 on right)
 
-        System.out.println("------------------------------------------------------------------------------------------------------------------");
-        System.out.printf("| %-10s | %-20s | %-15s | %-20s | %-15s |\n", "Vehicle ID", "Name", "Current Fuel", "Carrying Capacity", "Fuel Capacity");
-        System.out.println("------------------------------------------------------------------------------------------------------------------");
+        // Print the top border with the title centered
+        printTopBorderWithCenteredTitle(tableWidth, "VEHICLES INFORMATION");
+
+        // Print the header row with the new columns
+        System.out.printf("| %-15s | %-20s | %-20s | %-25s | %-20s | %-15s | %-15s |\n",
+                "Vehicle ID", "Licensed Plate", "Current Fuel (l)", "Carrying Capacity (kg)",
+                "Fuel Capacity (l)", "Vehicle Type", "Truck Type");
+
+        // Print the separator between header and data rows
+        printBorder(tableWidth);
+
+        // Print the data rows with the new columns
         for (Vehicle vehicle : vehiclesList) {
-            System.out.printf("| %-10s | %-20s | %-15.2f | %-20.2f | %-15.2f |\n",
-                    vehicle.getVehicleId(), vehicle.getName(), vehicle.getCurrentFuel(), vehicle.getCarryingCapacity(),
-                    vehicle.getFuelCapacity());
+            String vehicleType = "";
+            String truckType = "N/A";
+
+            if (vehicle instanceof Truck) {
+                vehicleType = "Truck";
+                truckType = ((Truck) vehicle).getType();
+            } else if (vehicle instanceof Ship) {
+                vehicleType = "Ship";
+            }
+
+            System.out.printf("| %-15s | %-20s | %-20.2f | %-25.2f | %-20.2f | %-15s | %-15s |\n",
+                    vehicle.getVehicleId(), vehicle.getName(), vehicle.getCurrentFuel(),
+                    vehicle.getCarryingCapacity(), vehicle.getFuelCapacity(), vehicleType, truckType);
         }
-        System.out.println("------------------------------------------------------------------------------------------------------------------");
+
+        // Print the bottom border of the table
+        printBorder(tableWidth);
     }
+
+
+    private void printBorder(int width) {
+        for (int i = 0; i < width; i++) {
+            System.out.print("-");
+        }
+        System.out.println();
+    }
+
+    private void printTopBorderWithCenteredTitle(int width, String title) {
+        int paddingSize = (width - title.length() - 2) / 2; // Subtracting 2 for the spaces on either side of the title
+        for (int i = 0; i < paddingSize; i++) {
+            System.out.print("-");
+        }
+        System.out.print(" " + title + " ");
+        for (int i = 0; i < width - title.length() - 2 - paddingSize * 2; i++) {
+            System.out.print("-");
+        }
+        for (int i = 0; i < paddingSize; i++) {
+            System.out.print("-");
+        }
+        System.out.println();
+    }
+
 
     @Override
     public void updateVehicle() {
@@ -121,14 +169,7 @@ public class VehicleServicesAdmin extends AdminBaseServices implements VehicleCR
         System.out.print("Enter vehicle ID to update: ");
         String vehicleIdToUpdate = scanner.nextLine();
 
-        List<Vehicle> vehicleList;
-        try {
-            Vehicle[] vehicleArray = (Vehicle[]) dbHandler.readObjects(Constants.VEHICLE_FILE_PATH);
-            vehicleList = new ArrayList<>(Arrays.asList(vehicleArray));
-        } catch (Exception e) {
-            System.out.println("Error reading vehicles or no vehicles exist.");
-            return;
-        }
+        List<Vehicle> vehicleList = fetchVehiclesFromDatabase();
 
         Vehicle vehicleToUpdate = null;
         for (Vehicle vehicle : vehicleList) {
@@ -180,15 +221,7 @@ public class VehicleServicesAdmin extends AdminBaseServices implements VehicleCR
         System.out.print("Enter vehicle ID to delete: ");
         String vehicleIdToDelete = scanner.nextLine();
 
-        List<Vehicle> vehicleList;
-        try {
-            Vehicle[] vehicleArray = (Vehicle[]) dbHandler.readObjects(Constants.VEHICLE_FILE_PATH);
-            vehicleList = new ArrayList<>(Arrays.asList(vehicleArray));
-        } catch (Exception e) {
-            System.out.println("Error reading vehicles or no vehicles exist.");
-            return;
-        }
-
+        List<Vehicle> vehicleList = fetchVehiclesFromDatabase();
         boolean isDeleted = false;
         Iterator<Vehicle> iterator = vehicleList.iterator();
         while (iterator.hasNext()) {
