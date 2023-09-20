@@ -1,7 +1,12 @@
 package views.flow;
 
 import services.admin.*;
+import services.statistics.PortStatistics;
+import services.statistics.TripStatistics;
+import services.statistics.VehicleStatistics;
 import views.BaseView;
+import utils.UiUtils;
+import services.statistics.ContainerStatistics;
 
 public class AdminFlow extends BaseView {
 
@@ -10,9 +15,15 @@ public class AdminFlow extends BaseView {
     private final ContainerServicesAdmin adminContainerController = new ContainerServicesAdmin();
     private final UserServicesAdmin adminUserController = new UserServicesAdmin();
     private final TripServicesAdmin adminTripController = new TripServicesAdmin();
+    private final UiUtils uiUtils = new UiUtils();
+    private final ContainerStatistics containerStatistics = new ContainerStatistics();
+    private final PortStatistics portStatistics = new PortStatistics();
+    private final VehicleStatistics vehicleStatistics = new VehicleStatistics();
+    private final TripStatistics tripStatistics = new TripStatistics();
 
     public void displayAdminMenu() {
-        clearScreen(); // Clear the screen for a fresh view. This method needs to be implemented.
+        uiUtils.clearScreen(); // Clear the screen for a fresh view. This method needs to be implemented.
+        System.out.println("Welcome, System Admin!");
         displayHeader("ADMIN MENU");
         displayMessage("1. Manage Ports");
         displayMessage("2. Manage Containers");
@@ -39,7 +50,7 @@ public class AdminFlow extends BaseView {
     }
 
     public void displayAdminPortsMenu() {
-        clearScreen();
+        uiUtils.clearScreen();
         displayHeader("ADMIN PORTS MENU");
         displayMessage("1. Add Port");
         displayMessage("2. Update Port");
@@ -85,7 +96,7 @@ public class AdminFlow extends BaseView {
     }
 
     public void displayAdminContainersMenu() {
-        clearScreen();
+        uiUtils.clearScreen();
         displayHeader("ADMIN CONTAINERS MENU");
         displayMessage("1. Add Container");
         displayMessage("2. Update Container");
@@ -132,7 +143,7 @@ public class AdminFlow extends BaseView {
     }
 
     public void displayAdminVehiclesMenu() {
-        clearScreen();
+        uiUtils.clearScreen();
         displayHeader("ADMIN VEHICLES MENU");
         displayMessage("1. Add Vehicle");
         displayMessage("2. Update Vehicle");
@@ -178,7 +189,7 @@ public class AdminFlow extends BaseView {
     }
 
     public void displayAdminUsersMenu() {
-        clearScreen();
+        uiUtils.clearScreen();
         displayHeader("ADMIN USERS MENU");
         displayMessage("1. Add Port Manager");
         displayMessage("2. Update Port Manager");
@@ -223,7 +234,7 @@ public class AdminFlow extends BaseView {
     }
 
     public void displayAdminTripsMenu() {
-        clearScreen();
+        uiUtils.clearScreen();
         displayHeader("ADMIN TRIPS MENU");
         displayMessage("1. Add Trip");
         displayMessage("2. Update Trip");
@@ -269,13 +280,52 @@ public class AdminFlow extends BaseView {
     }
 
     public void displayAdminStatisticsMenu () {
-        clearScreen();
+        uiUtils.clearScreen();
         displayHeader("ADMIN STATISTICS MENU");
         displayMessage("1. View Port Statistics");
         displayMessage("2. View Container Statistics");
         displayMessage("3. View Vehicle Statistics");
         displayMessage("4. View Trip Statistics");
         displayMessage("0. Back");
+
+        int choice = promptForInput("Enter your choice: ");
+        switch (choice) {
+            case 1 -> {
+                portStatistics.displayTotalNumberOfPorts();
+                portStatistics.portUsedCapacity();
+                portStatistics.portTripCount();
+                backToMenu();
+                displayAdminStatisticsMenu();
+            }
+            case 2 -> {
+                containerStatistics.displayTotalNumberOfContainers();
+                containerStatistics.containerStatus();
+                containerStatistics.containerType();
+                containerStatistics.containerPerPort();
+                backToMenu();
+                displayAdminStatisticsMenu();
+            }
+            case 3 -> {
+                vehicleStatistics.displayTotalNumberOfVehicles();
+                vehicleStatistics.vehiclePerPort();
+                vehicleStatistics.vehicleStatus();
+                vehicleStatistics.vehicleType();
+            }
+            case 4 -> {
+                tripStatistics.displayTotalTrips();
+                tripStatistics.tripStatus();
+                tripStatistics.tripByVehicle();
+                tripStatistics.averageTripDuration();
+                backToMenu();
+                displayAdminStatisticsMenu();
+            }
+            case 0 -> displayAdminMenu();
+            default -> {
+                displayMessage("Invalid choice. Please try again");
+                backToMenu();
+                displayAdminStatisticsMenu();
+            }
+        }
     }
 }
 
