@@ -6,7 +6,7 @@
   Group: Team Hi
   Members:
   Phan Nhat Minh - s3978598
-  Huynh Duc Gia Tin - s3818078
+  Huynh Duc Gia Tin - s3962053
   Nguyen Viet Ha - s3978128
   Vu Minh Ha - s3978681
   Created  date: 02/09/2023
