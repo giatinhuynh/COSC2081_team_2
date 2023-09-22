@@ -9,14 +9,22 @@ import java.util.List;
 import database.DatabaseHandler;
 import utils.Constants;
 
+/**
+ * VehiclePopulation is a class responsible for generating and managing vehicles
+ * and storing them in a database.
+ */
 public class VehiclePopulation {
 
     private static final String VEHICLE_FILE_PATH = Constants.VEHICLE_FILE_PATH;
     private final DatabaseHandler dbHandler = new DatabaseHandler();
 
+    /**
+     * Generates a list of vehicles and stores them in the database.
+     */
     public void run() {
         List<Vehicle> vehiclesList;
         try {
+            // Read existing vehicles from the database if they exist
             Vehicle[] vehiclesArray = (Vehicle[]) dbHandler.readObjects(VEHICLE_FILE_PATH);
             vehiclesList = new ArrayList<>(Arrays.asList(vehiclesArray));
         } catch (Exception e) {
@@ -36,6 +44,7 @@ public class VehiclePopulation {
                 "74C-678.94", "75C-789.05", "76C-890.16", "77C-901.27", "78C-012.38"
         };
 
+        // Generate Basic Trucks
         for (int i = 1; i <= 20; i++) {
             String vehicleId = String.format("V-%06d", i);
             String name = licensePlates[i - 1];
@@ -46,6 +55,7 @@ public class VehiclePopulation {
             vehiclesList.add(new Truck(vehicleId, name, currentFuel, carryingCapacity, fuelCapacity, type));
         }
 
+        // Generate Reefer Trucks
         for (int i = 21; i <= 40; i++) {
             String vehicleId = String.format("V-%06d", i);
             String name = licensePlates[i - 1];
@@ -56,6 +66,7 @@ public class VehiclePopulation {
             vehiclesList.add(new Truck(vehicleId, name, currentFuel, carryingCapacity, fuelCapacity, type));
         }
 
+        // Generate Tanker Trucks
         for (int i = 41; i <= 50; i++) {
             String vehicleId = String.format("V-%06d", i);
             String name = licensePlates[i - 1];
@@ -66,9 +77,13 @@ public class VehiclePopulation {
             vehiclesList.add(new Truck(vehicleId, name, currentFuel, carryingCapacity, fuelCapacity, type));
         }
 
+        // Write the updated vehicles list back to the database
         dbHandler.writeObjects(VEHICLE_FILE_PATH, vehiclesList.toArray(new Vehicle[0]));
     }
 
+    /**
+     * Empties the vehicle database by writing an empty array of vehicles.
+     */
     public void emptyDatabase() {
         try {
             dbHandler.writeObjects(VEHICLE_FILE_PATH, new Vehicle[0]);
@@ -78,9 +93,15 @@ public class VehiclePopulation {
         }
     }
 
-
+    /**
+     * The main method to execute vehicle population.
+     *
+     * @param args Command-line arguments (not used in this application).
+     */
     public static void main(String[] args) {
         VehiclePopulation vehiclePopulation = new VehiclePopulation();
+        vehiclePopulation.emptyDatabase();
         vehiclePopulation.run();
     }
 }
+

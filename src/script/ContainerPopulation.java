@@ -9,22 +9,38 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * ContainerPopulation is a class responsible for generating and managing containers
+ * and storing them in a database.
+ */
 public class ContainerPopulation {
 
-    private final String CONTAINER_FILE_PATH = Constants.CONTAINER_FILE_PATH;
+    private static final String CONTAINER_FILE_PATH = Constants.CONTAINER_FILE_PATH;
     private final DatabaseHandler dbHandler = new DatabaseHandler();
     private final Random rand = new Random();
 
-    // Helper function to generate random weight
+    /**
+     * Generates a random weight within a specified range.
+     *
+     * @param min The minimum weight.
+     * @param max The maximum weight.
+     * @return A random weight.
+     */
     double getRandomWeight(double min, double max) {
         return min + (max - min) * rand.nextDouble();
     }
+
+    /**
+     * Populates the container list with various types of containers and writes them to the database.
+     */
     public void run() {
         List<Container> containersList;
         try {
+            // Read existing containers from the database if they exist
             Container[] containersArray = (Container[]) dbHandler.readObjects(CONTAINER_FILE_PATH);
             containersList = new ArrayList<>(Arrays.asList(containersArray));
-        } catch (Exception e) {  // Catching a generic exception as a placeholder.
+        } catch (Exception e) {
+            // Catching a generic exception as a placeholder.
             System.out.println("Error reading containers or no containers exist.");
             containersList = new ArrayList<>();
         }
@@ -72,6 +88,9 @@ public class ContainerPopulation {
         }
     }
 
+    /**
+     * Empties the container database by writing an empty array of containers.
+     */
     public void emptyDatabase() {
         try {
             dbHandler.writeObjects(CONTAINER_FILE_PATH, new Container[0]);
@@ -80,8 +99,14 @@ public class ContainerPopulation {
         }
     }
 
+    /**
+     * The main method to execute container population.
+     *
+     * @param args Command-line arguments (not used in this application).
+     */
     public static void main(String[] args) {
         ContainerPopulation containerPopulation = new ContainerPopulation();
+        containerPopulation.emptyDatabase();
         containerPopulation.run();
     }
 }
