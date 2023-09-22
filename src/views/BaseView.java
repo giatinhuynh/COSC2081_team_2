@@ -24,10 +24,12 @@ public abstract class BaseView {
     protected void displayHeader(String title) {
         int width = 30;
         int padding = (width - title.length()) / 2;
-        displayMessage("=".repeat(width));
-        displayMessage("=".repeat(padding) + title + "=".repeat(padding));
-        displayMessage("=".repeat(width));
+
+        String coloredTitle = "\u001B[33m" + title + "\u001B[0m"; // Yellow color
+
+        displayMessage("-".repeat(padding) + coloredTitle + "-".repeat(padding));
     }
+
 
     protected void displayHorizontalLine() {
         displayMessage("-".repeat(30));
@@ -43,12 +45,13 @@ public abstract class BaseView {
     }
 
     protected void backToMenu() {
-        System.out.println("Press enter to go continue...");
+        System.out.print("Press enter to go continue...");
+        scanner.nextLine();
         scanner.nextLine();
     }
 
     protected void logoutView() {
-        System.out.println("Logging out...");
+        System.out.println("\u001B[31mLogging out...\u001B[0m");
         System.out.println("Thank you for using our system!");
     }
 
