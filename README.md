@@ -57,7 +57,7 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 
 ---
 
-For any additional information or queries, please contact any of the team members.
+For any additional information or queries, please contact **s3978598@rmit.edu.vn**.
 
 ## GitHub Repository URL
 [Port Management System GitHub Repository](https://github.com/your-team-name/port-management-system)
