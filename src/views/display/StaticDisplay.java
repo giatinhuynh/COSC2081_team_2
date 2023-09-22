@@ -1,6 +1,7 @@
 package views.display;
 
 import views.BaseView;
+import utils.UiUtils;
 
 import java.util.Arrays;
 
@@ -9,6 +10,8 @@ import java.util.Arrays;
  * This class provides methods to display static messages and separators in the console.
  */
 public class StaticDisplay extends BaseView {
+
+    private final UiUtils uiUtils = new UiUtils();
 
     /**
      * Displays the assessment information including group assignment details, instructor names, and group members.
