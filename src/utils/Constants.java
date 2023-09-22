@@ -43,7 +43,7 @@ public class Constants {
 
     private static Date initializeSystemDate() {
         try {
-            return new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").parse("2020/01/01 00:00:00");
+            return new SimpleDateFormat("yyyy/MM/dd").parse("2020/01/01");
         } catch (ParseException e) {
             throw new RuntimeException("Failed to parse system date", e);
         }
