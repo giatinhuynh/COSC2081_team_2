@@ -11,6 +11,7 @@ import models.vehicle.Vehicle;
 import services.admin.PortServicesAdmin;
 import utils.Constants;
 import utils.CurrentUser;
+import utils.UiUtils;
 
 import java.util.*;
 
@@ -21,12 +22,24 @@ public class ContainerServicesManager extends ManagerBaseServices implements Con
     private final Scanner scanner = new Scanner(System.in);
     private final String CONTAINER_FILE_PATH = Constants.CONTAINER_FILE_PATH;
     private final DatabaseHandler dbHandler = new DatabaseHandler();
+    private final UiUtils uiUtils = new UiUtils();
 
     public ContainerServicesManager() {
         if (CurrentUser.getUser() instanceof PortManager) {
             this.managedPort = ((PortManager) CurrentUser.getUser()).getManagedPort();
         } else {
             throw new IllegalStateException("The current user is not a Port Manager");
+        }
+    }
+
+    // Modularized method to fetch containers from the database
+    public List<Container> fetchContainersFromDatabase() {
+        try {
+            Container[] containersArray = (Container[]) dbHandler.readObjects(CONTAINER_FILE_PATH);
+            return new ArrayList<>(Arrays.asList(containersArray));
+        } catch (Exception e) {  // Catching a generic exception as a placeholder.
+            System.out.println("Error reading containers or no containers exist.");
+            return new ArrayList<>();
         }
     }
 
@@ -143,7 +156,7 @@ public class ContainerServicesManager extends ManagerBaseServices implements Con
         }
 
         containerList.add(newContainer);
-        managedPort.getCurrentContainers().add(newContainer);
+        managedPort.addContainer(newContainer);
 
         dbHandler.writeObjects(CONTAINER_FILE_PATH, containerList.toArray(new Container[0]));
     }
@@ -179,19 +192,22 @@ public class ContainerServicesManager extends ManagerBaseServices implements Con
     public void displayAllContainers() {
         System.out.println("DISPLAY ALL CONTAINERS INFO");
 
-        List<Container> containerList = managedPort.getCurrentContainers();
+        List<Container> containerList = fetchContainersFromDatabase();
 
-        displayContainers(containerList);
-    }
+        System.out.println(managedPort.getPortId() + " containers:" + containerList.size());
 
-    private void displayContainers(List<Container> containers) {
-        System.out.println("--------------------------------------------------------------------------------------");
+        uiUtils.printHorizontalLine(15, 20, 15);
         System.out.printf("| %-15s | %-20s | %-15s |\n", "Container ID", "Container Type", "Weight");
-        System.out.println("--------------------------------------------------------------------------------------");
-        for (Container container : containers) {
-            System.out.printf("| %-15s | %-20s | %-15.2f |\n", container.getContainerId(), container.getContainerType(), container.getWeight());
+        uiUtils.printHorizontalLine(15, 20, 15);
+        for (Container container : containerList) {
+            if (container.getCurrentPort() == null) {
+                continue;
+            }
+            if (container.getCurrentPort().getPortId().equals(managedPort.getPortId())) {
+                System.out.printf("| %-15s | %-20s | %-15.2f |\n", container.getContainerId(), container.getContainerType(), container.getWeight());
+            }
         }
-        System.out.println("--------------------------------------------------------------------------------------");
+        uiUtils.printHorizontalLine(15, 20, 15);
     }
 
     public void updateContainer() {

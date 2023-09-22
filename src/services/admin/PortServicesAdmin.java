@@ -16,10 +16,12 @@
 package services.admin;
 
 import database.DatabaseHandler;
+import exceptions.TypeCheck;
 import interfaces.CRUD.PortCRUD;
 import models.port.Port;
 import utils.Constants;
 import exceptions.InputValidation;
+import utils.UiUtils;
 
 import java.util.*;
 
@@ -29,6 +31,8 @@ public class PortServicesAdmin extends AdminBaseServices implements PortCRUD {
     private final String PORT_FILE_PATH = Constants.PORT_FILE_PATH;
     private final DatabaseHandler dbHandler = new DatabaseHandler();
     private final InputValidation inputValidation = new InputValidation();
+    private final UiUtils uiUtils = new UiUtils();
+    private final TypeCheck typeCheck = new TypeCheck();
 
 
     // Modularized method to fetch ports from the database
@@ -37,7 +41,7 @@ public class PortServicesAdmin extends AdminBaseServices implements PortCRUD {
             Port[] portsArray = (Port[]) dbHandler.readObjects(PORT_FILE_PATH);
             return new ArrayList<>(Arrays.asList(portsArray));
         } catch (Exception e) {  // Catching a generic exception as a placeholder.
-            System.out.println("Error reading ports or no ports exist.");
+            uiUtils.printFailedMessage("Error reading ports from the database.");
             return new ArrayList<>();
         }
     }
@@ -56,15 +60,12 @@ public class PortServicesAdmin extends AdminBaseServices implements PortCRUD {
 
     @Override
     public void createNewPort() {
-        clearScreen();  // Optional: Clear the console for a clean UI. Implementation depends on the OS.
+        uiUtils.clearScreen();  // Optional: Clear the console for a clean UI. Implementation depends on the OS.
 
-        // Header
-        System.out.println("======================================");
-        System.out.println("           PORT CREATE WIZARD         ");
-        System.out.println("======================================");
+        uiUtils.printFunctionName("PORT CREATION WIZARD", 100);
         System.out.println();  // Blank line for spacing
 
-        String portId = inputValidation.idValidation("P-");
+        String portId = inputValidation.idValidation("P-", "Enter port ID to create: ");
         System.out.println();  // Blank line for spacing
 
         String name = inputValidation.getString("Enter port name: ");
@@ -89,59 +90,65 @@ public class PortServicesAdmin extends AdminBaseServices implements PortCRUD {
         writePortsToDatabase(portsList);
 
         // Confirmation message
-        System.out.println("======================================");
-        System.out.println("   Port successfully created!         ");
-        System.out.println("======================================");
+        uiUtils.printSuccessMessage("Port with ID " + portId + " created successfully.");
     }
 
     @Override
     public void findPort() {
-        clearScreen();
-        System.out.println("======================================");
-        System.out.println("          DISPLAY PORT INFO           ");
-        System.out.println("======================================");
+        uiUtils.clearScreen();
+
+        uiUtils.printFunctionName("PORT SEARCH WIZARD", 100);
         System.out.println();
 
-        String portIdToDisplay = inputValidation.idValidation("P-");
+        String portIdToDisplay = inputValidation.idValidation("P-", "Enter port ID to search: ");
         System.out.println();
 
         Optional<Port> optionalPort = findPortById(portIdToDisplay);
 
+
         if (optionalPort.isPresent()) {
             Port portToDisplay = optionalPort.get();
-            displayPortTableHeader();
+            String name = portToDisplay.getName();
+            uiUtils.printTopBorderWithTableName( name + " INFORMATION", 10, 30, 10, 10, 25, 25);
+            System.out.printf("| %-10s | %-30s | %-10s | %-10s | %-25s | %-25s |\n",
+                    "Port ID", "Name", "Latitude", "Longitude", "Storing Capacity (kg)", "Landing Ability (T/F)");
+            uiUtils.printHorizontalLine(10, 30, 10, 10, 25, 25);
             displayPortTableRow(portToDisplay);
-            System.out.println("--------------------------------------------------------------------------------------");
+            uiUtils.printHorizontalLine(10, 30, 10, 10, 25, 25);
         } else {
-            System.out.println("No port found with the given ID.");
+            uiUtils.printFailedMessage("No port found with the given ID.");
         }
     }
 
     @Override
     public void displayAllPorts() {
-        clearScreen();
-        System.out.println("======================================");
-        System.out.println("        DISPLAY ALL PORTS INFO        ");
-        System.out.println("======================================");
-        System.out.println();
+        uiUtils.clearScreen();
 
         List<Port> portsList = fetchPortsFromDatabase();
-        displayPortTableHeader();
+
+        uiUtils.printTopBorderWithTableName("PORTS INFORMATION", 10, 30, 10, 10, 25, 25);
+        System.out.printf("| %-10s | %-30s | %-10s | %-10s | %-25s | %-25s |\n",
+                "Port ID", "Name", "Latitude", "Longitude", "Storing Capacity (kg)", "Landing Ability (T/F)");
+        uiUtils.printHorizontalLine(10, 30, 10, 10, 25, 25);
         for (Port port : portsList) {
             displayPortTableRow(port);
         }
-        System.out.println("--------------------------------------------------------------------------------------");
+        uiUtils.printHorizontalLine(10, 30, 10, 10, 25, 25);
+    }
+
+    public void displayPortTableRow(Port port) {
+        System.out.printf("| %-10s | %-30s | %-10.4f | %-10.4f | %,-25.2f | %-25b |\n",
+                port.getPortId(), port.getName(), port.getLatitude(), port.getLongitude(),
+                port.getStoringCapacity(), port.getLandingAbility());
     }
 
     @Override
     public void updatePort() {
-        clearScreen();
-        System.out.println("======================================");
-        System.out.println("          PORT UPDATE WIZARD          ");
-        System.out.println("======================================");
-        System.out.println();
+        uiUtils.clearScreen();
 
-        String portIdToUpdate = inputValidation.idValidation("P-");
+        uiUtils.printFunctionName("PORT UPDATE WIZARD", 100);
+
+        String portIdToUpdate = inputValidation.idValidation("P-", "Enter port ID to update: ");
         System.out.println();
 
         List<Port> portsList = fetchPortsFromDatabase();
@@ -154,62 +161,71 @@ public class PortServicesAdmin extends AdminBaseServices implements PortCRUD {
             System.out.println("Enter new port name (leave blank to keep unchanged): ");
             String name = scanner.nextLine();
             if (!name.isEmpty()) {
-                portToUpdate.setName(name);
+                if (typeCheck.isString(name)) {
+                    portToUpdate.setName(name.toUpperCase());
+                }
             }
 
             System.out.println("Enter new port latitude (leave blank to keep unchanged): ");
             String latitudeStr = scanner.nextLine();
             if (!latitudeStr.isEmpty()) {
-                double latitude = Double.parseDouble(latitudeStr);
-                portToUpdate.setLatitude(latitude);
+                if (typeCheck.isDouble(latitudeStr)) {
+                    double latitude = Double.parseDouble(latitudeStr);
+                    portToUpdate.setLatitude(latitude);
+                }
             }
 
             System.out.println("Enter new port longitude (leave blank to keep unchanged): ");
             String longitudeStr = scanner.nextLine();
             if (!longitudeStr.isEmpty()) {
-                double longitude = Double.parseDouble(longitudeStr);
-                portToUpdate.setLongitude(longitude);
+                if (typeCheck.isDouble(longitudeStr)) {
+                    double longitude = Double.parseDouble(longitudeStr);
+                    portToUpdate.setLongitude(longitude);
+                }
             }
 
-            System.out.println("Enter new port storing capacity (leave blank to keep unchanged): ");
+            System.out.println("Enter new port storing capacity in kilograms (leave blank to keep unchanged): ");
             String capacityStr = scanner.nextLine();
             if (!capacityStr.isEmpty()) {
-                double storingCapacity = Double.parseDouble(capacityStr);
-                portToUpdate.setStoringCapacity(storingCapacity);
+                if (typeCheck.isDouble(capacityStr)) {
+                    double storingCapacity = Double.parseDouble(capacityStr);
+                    portToUpdate.setStoringCapacity(storingCapacity);
+                }
             }
 
-            System.out.println("Enter new port landing ability (True/False, leave blank to keep unchanged): ");
+            System.out.println("Enter new port landing ability (True/False), leave blank to keep unchanged): ");
             String landingAbilityStr = scanner.nextLine();
             if (!landingAbilityStr.isEmpty()) {
-                boolean landingAbility = Boolean.parseBoolean(landingAbilityStr);
-                portToUpdate.setLandingAbility(landingAbility);
+                if (typeCheck.isBoolean(landingAbilityStr)) {
+                    boolean landingAbility = Boolean.parseBoolean(landingAbilityStr);
+                    portToUpdate.setLandingAbility(landingAbility);
+                }
             }
 
             writePortsToDatabase(portsList);
-            System.out.println("Port with ID " + portIdToUpdate + " updated successfully.");
+            uiUtils.printSuccessMessage("Port with ID " + portIdToUpdate + " updated successfully.");
         } else {
-            System.out.println("No port found with the given ID.");
+            uiUtils.printFailedMessage("No port found with the given ID.");
         }
     }
 
+
     @Override
     public void deletePort() {
-        clearScreen();
-        System.out.println("======================================");
-        System.out.println("          PORT DELETE WIZARD          ");
-        System.out.println("======================================");
-        System.out.println();
+        uiUtils.clearScreen();
 
-        String portIdToDelete = inputValidation.idValidation("P-");
+        uiUtils.printFunctionName("PORT DELETION WIZARD", 100);
+
+        String portIdToDelete = inputValidation.idValidation("P-", "Enter port ID to delete: ");
         System.out.println();
 
         List<Port> portsList = fetchPortsFromDatabase();
         boolean isDeleted = portsList.removeIf(port -> port.getPortId().equals(portIdToDelete));
         if (isDeleted) {
             writePortsToDatabase(portsList);
-            System.out.println("Port with ID " + portIdToDelete + " deleted successfully.");
+            uiUtils.printSuccessMessage("Port with ID " + portIdToDelete + " deleted successfully.");
         } else {
-            System.out.println("No port found with the given ID.");
+            uiUtils.printFailedMessage("No port found with the given ID.");
         }
     }
 

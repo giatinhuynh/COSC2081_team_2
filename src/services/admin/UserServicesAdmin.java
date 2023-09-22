@@ -1,5 +1,21 @@
+/*
+  RMIT University Vietnam
+  Course: COSC2081 Programming 1
+  Semester: 2023B
+  Assessment: Group Assignment
+  Group: Team Hi
+  Members:
+  Phan Nhat Minh - s3978598
+  Huynh Duc Gia Tin - s3962053
+  Nguyen Viet Ha - s3978128
+  Vu Minh Ha - s3978681
+  Created  date: 02/09/2023
+  Acknowledgement: chat.openai.com, stackoverflow.com, geeksforgeeks.org, javatpoint.com, tutorialspoint.com, oracle.com, w3schools.com, github.com
+*/
+
 package services.admin;
 
+import exceptions.InputValidation;
 import interfaces.CRUD.UserCRUD;
 import models.port.Port;
 import models.user.SystemAdmin;
@@ -7,6 +23,7 @@ import utils.Constants;
 import database.DatabaseHandler;
 import models.user.User;
 import models.user.PortManager;
+import utils.UiUtils;
 
 import java.util.*;
 
@@ -15,51 +32,56 @@ public class UserServicesAdmin extends AdminBaseServices implements UserCRUD {
     private final Scanner scanner = new Scanner(System.in);
     private final String USER_FILE_PATH = Constants.USER_FILE_PATH;
     private final DatabaseHandler dbHandler = new DatabaseHandler();
+    private final UiUtils uiUtils = new UiUtils();
+    private final InputValidation inputValidation = new InputValidation();
+
+    public List<PortManager> fetchManagersFromDatabase() {
+        try {
+            PortManager[] managersArray = (PortManager[]) dbHandler.readObjects(USER_FILE_PATH);
+            return new ArrayList<>(Arrays.asList(managersArray));
+        } catch (Exception e) {
+            return new ArrayList<>();
+        }
+    }
 
     @Override
     public void createNewUser() {
-        System.out.println("PORT MANAGER CREATE WIZARD");
+        uiUtils.clearScreen();
 
-        System.out.print("Enter username: ");
-        String username = scanner.nextLine();
+        uiUtils.printFunctionName("PORT MANAGER CREATION WIZARD", 100);
+        System.out.println();
 
-        System.out.print("Enter password: ");
-        String password = scanner.nextLine();
+        String username = inputValidation.getUserInfo("Enter username: ");
+        System.out.println();
 
-        System.out.print("Enter managed port ID: ");
-        String managedPortId = scanner.nextLine();
+        String password = inputValidation.getUserInfo("Enter password: ");
+        System.out.println();
+
+        String managedPortId = inputValidation.idValidation("P", "Enter managed port ID:");
+        System.out.println();
+
         PortServicesAdmin portController = new PortServicesAdmin();
         Port managedPort = portController.getPortById(managedPortId);
 
         PortManager newPortManager = new PortManager(username, password, managedPort);
 
-        List<PortManager> managersList;
-        try {
-            PortManager[] managersArray = (PortManager[]) dbHandler.readObjects(USER_FILE_PATH);
-            managersList = new ArrayList<>(Arrays.asList(managersArray));
-        } catch (Exception e) {
-            managersList = new ArrayList<>();
-        }
-
+        List<PortManager> managersList = fetchManagersFromDatabase();
         managersList.add(newPortManager);
         dbHandler.writeObjects(USER_FILE_PATH, managersList.toArray(new PortManager[0]));
-        System.out.println("PortManager created successfully!");
+        uiUtils.printSuccessMessage("Port Manager for port " + portController.getPortById(managedPortId).getName() + " created successfully.");
     }
 
     @Override
     public void findUser() {
-        System.out.println("DISPLAY PORT MANAGER INFO");
-        System.out.print("Enter username: ");
-        String usernameToDisplay = scanner.nextLine();
+        uiUtils.clearScreen();
 
-        List<PortManager> managersList;
-        try {
-            PortManager[] managersArray = (PortManager[]) dbHandler.readObjects(USER_FILE_PATH);
-            managersList = new ArrayList<>(Arrays.asList(managersArray));
-        } catch (Exception e) {
-            System.out.println("Error reading port managers or none exist.");
-            return;
-        }
+        uiUtils.printFunctionName("PORT MANAGER SEARCH WIZARD", 100);
+        System.out.println();
+
+        String usernameToDisplay = inputValidation.getUserInfo("Enter username to search: ");
+        System.out.println();
+
+        List<PortManager> managersList = fetchManagersFromDatabase();
 
         PortManager managerToDisplay = null;
         for (PortManager manager : managersList) {
@@ -70,52 +92,41 @@ public class UserServicesAdmin extends AdminBaseServices implements UserCRUD {
         }
 
         if (managerToDisplay != null) {
-            System.out.println("--------------------------------------------");
-            System.out.printf("| %-15s | %-25s |\n", "Username", "Managed Port ID");
-            System.out.println("--------------------------------------------");
-            System.out.printf("| %-15s | %-25s |\n", managerToDisplay.getUsername(), managerToDisplay.getManagedPort().getPortId());
-            System.out.println("--------------------------------------------");
+            uiUtils.printTopBorderWithTableName("PORT MANAGER INFO", 15, 15, 25);
+            System.out.printf("| %-15s | %-15s | %-25s |\n", "Username", "Password", "Managed Port ID");
+            uiUtils.printHorizontalLine(15, 15, 25);
+            System.out.printf("| %-15s | %-15s | %-25s |\n", managerToDisplay.getUsername(),
+                    managerToDisplay.getPassword(), managerToDisplay.getManagedPort().getPortId());
+            uiUtils.printHorizontalLine(15, 15, 25);
         } else {
-            System.out.println("No PortManager found with the given username.");
+            uiUtils.printFailedMessage("No PortManager found with the given username.");
         }
     }
 
     @Override
     public void displayAllUsers() {
-        System.out.println("DISPLAY ALL PORT MANAGERS INFO");
+        List<PortManager> managersList = fetchManagersFromDatabase();
 
-        List<PortManager> managersList;
-        try {
-            PortManager[] managersArray = (PortManager[]) dbHandler.readObjects(USER_FILE_PATH);
-            managersList = new ArrayList<>(Arrays.asList(managersArray));
-        } catch (Exception e) {
-            System.out.println("Error reading port managers or none exist.");
-            return;
-        }
-
-        System.out.println("--------------------------------------------");
-        System.out.printf("| %-15s | %-25s |\n", "Username", "Managed Port ID");
-        System.out.println("--------------------------------------------");
+        uiUtils.printTopBorderWithTableName("PORT MANAGERS INFORMATION", 15, 15, 25);
+        System.out.printf("| %-15s | %-15s | %-25s |\n", "Username", "Password", "Managed Port ID");
+        uiUtils.printHorizontalLine(15, 15, 25);
         for (PortManager manager : managersList) {
-            System.out.printf("| %-15s | %-25s |\n", manager.getUsername(), manager.getManagedPort().getPortId());
+            System.out.printf("| %-15s | %-15s | %-25s |\n", manager.getUsername(), manager.getPassword(),
+                    manager.getManagedPort().getPortId());
         }
-        System.out.println("--------------------------------------------");
+        uiUtils.printHorizontalLine(15, 15, 25);
     }
 
     @Override
     public void updateUser() {
-        System.out.println("PORT MANAGER UPDATE WIZARD");
-        System.out.print("Enter username to update: ");
-        String usernameToUpdate = scanner.nextLine();
+        uiUtils.clearScreen();
 
-        List<PortManager> managersList;
-        try {
-            PortManager[] managersArray = (PortManager[]) dbHandler.readObjects(USER_FILE_PATH);
-            managersList = new ArrayList<>(Arrays.asList(managersArray));
-        } catch (Exception e) {
-            System.out.println("Error reading port managers or none exist.");
-            return;
-        }
+        uiUtils.printFunctionName("PORT MANAGER UPDATE WIZARD", 100);
+        System.out.println();
+
+        String usernameToUpdate = inputValidation.getUserInfo("Enter username to update: ");
+
+        List<PortManager> managersList = fetchManagersFromDatabase();
 
         PortManager managerToUpdate = null;
         for (PortManager manager : managersList) {
@@ -133,26 +144,23 @@ public class UserServicesAdmin extends AdminBaseServices implements UserCRUD {
             }
 
             dbHandler.writeObjects(USER_FILE_PATH, managersList.toArray(new PortManager[0]));
-            System.out.println("PortManager with username " + usernameToUpdate + " updated successfully.");
+            uiUtils.printSuccessMessage("PortManager with username " + usernameToUpdate + " updated successfully.");
         } else {
-            System.out.println("No PortManager found with the given username.");
+            uiUtils.printFailedMessage("No PortManager found with the given username.");
         }
     }
 
     @Override
     public void deleteUser() {
-        System.out.println("PORT MANAGER DELETE WIZARD");
-        System.out.print("Enter username to delete: ");
-        String usernameToDelete = scanner.nextLine();
+        uiUtils.clearScreen();
 
-        List<PortManager> managersList;
-        try {
-            PortManager[] managersArray = (PortManager[]) dbHandler.readObjects(USER_FILE_PATH);
-            managersList = new ArrayList<>(Arrays.asList(managersArray));
-        } catch (Exception e) {
-            System.out.println("Error reading port managers or none exist.");
-            return;
-        }
+        uiUtils.printFunctionName("PORT MANAGER DELETION WIZARD", 100);
+        System.out.println();
+
+        String usernameToDelete = inputValidation.getUserInfo("Enter username to delete: ");
+        System.out.println();
+
+        List<PortManager> managersList = fetchManagersFromDatabase();
 
         boolean isDeleted = false;
         Iterator<PortManager> iterator = managersList.iterator();
@@ -167,9 +175,9 @@ public class UserServicesAdmin extends AdminBaseServices implements UserCRUD {
 
         if (isDeleted) {
             dbHandler.writeObjects(USER_FILE_PATH, managersList.toArray(new PortManager[0]));
-            System.out.println("PortManager with username " + usernameToDelete + " deleted successfully.");
+            uiUtils.printSuccessMessage("PortManager with username " + usernameToDelete + " deleted successfully.");
         } else {
-            System.out.println("No PortManager found with the given username.");
+            uiUtils.printFailedMessage("No PortManager found with the given username.");
         }
     }
 
@@ -182,7 +190,7 @@ public class UserServicesAdmin extends AdminBaseServices implements UserCRUD {
                 User[] usersArray = (User[]) dbHandler.readObjects(USER_FILE_PATH);
                 usersList = new ArrayList<>(Arrays.asList(usersArray));
             } catch (Exception e) {
-                System.out.println("Error reading users or no users exist.");
+                uiUtils.printFailedMessage("Error reading users or no users exist.");
                 return null;
             }
 

@@ -80,6 +80,15 @@ public abstract class Container implements Serializable {
         return null;
     }
 
+    public Object getLocation() {
+        if (location instanceof Port) {
+            return ((Port) location).getName();
+        } else if (location instanceof Vehicle) {
+            return ((Vehicle) location).getName();
+        }
+        return null;
+    }
+
     public String getContainerStatus() {
         if (location instanceof Port) {
             return "Awaiting loading";

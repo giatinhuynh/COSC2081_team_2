@@ -1,11 +1,29 @@
+/*
+  RMIT University Vietnam
+  Course: COSC2081 Programming 1
+  Semester: 2023B
+  Assessment: Group Assignment
+  Group: Team Hi
+  Members:
+  Phan Nhat Minh - s3978598
+  Huynh Duc Gia Tin - s3962053
+  Nguyen Viet Ha - s3978128
+  Vu Minh Ha - s3978681
+  Created  date: 02/09/2023
+  Acknowledgement: chat.openai.com, stackoverflow.com, geeksforgeeks.org, javatpoint.com, tutorialspoint.com, oracle.com, w3schools.com, github.com
+*/
+
 package services.admin;
 
+import exceptions.InputValidation;
+import exceptions.TypeCheck;
 import interfaces.CRUD.TripCRUD;
 import models.trip.Trip;
 import models.vehicle.Vehicle;
 import utils.Constants;
 import database.DatabaseHandler;
 import models.port.Port;
+import utils.UiUtils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -16,7 +34,9 @@ public class TripServicesAdmin extends AdminBaseServices implements TripCRUD {
     private final Scanner scanner = new Scanner(System.in);
     private final String TRIP_FILE_PATH = Constants.TRIP_FILE_PATH;
     private final DatabaseHandler dbHandler = new DatabaseHandler();
-    private SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm");
+    private SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+    private final UiUtils uiUtils = new UiUtils();
+    private final InputValidation inputValidation = new InputValidation();
 
     // Modularized method to fetch trips from the database
     public List<Trip> fetchTripsFromDatabase() {
@@ -24,27 +44,28 @@ public class TripServicesAdmin extends AdminBaseServices implements TripCRUD {
             Trip[] tripsArray = (Trip[]) dbHandler.readObjects(TRIP_FILE_PATH);
             return new ArrayList<>(Arrays.asList(tripsArray));
         } catch (Exception e) {  // Catching a generic exception as a placeholder.
-            System.out.println("Error reading trips or no trips exist.");
+            uiUtils.printFailedMessage("Error reading trips or no trips exist.");
             return new ArrayList<>();
         }
     }
 
     @Override
     public void createTrip() {
-        System.out.println("TRIP CREATE WIZARD");
+        uiUtils.clearScreen();
 
-        System.out.print("Enter trip ID: ");
-        String tripId = scanner.nextLine();
+        uiUtils.printFunctionName("TRIP CREATION WIZARD", 100);
+        System.out.println();
 
-        // Assuming VehicleServicesAdmin has a method to display all Vehicles for the user to choose from
+        String tripId = inputValidation.idValidation("T", "Enter trip ID to create: ");
+        System.out.println();
+
         VehicleServicesAdmin vehicleController = new VehicleServicesAdmin();
-        vehicleController.displayAllVehicles(); // Display available vehicles
+        vehicleController.displayAllVehicles();
 
-        System.out.print("Enter vehicle ID for the trip: ");
-        String vehicleId = scanner.nextLine();
+        String vehicleId = inputValidation.idValidation("V", "Enter vehicle ID for the trip: ");
         Vehicle vehicle = vehicleController.getVehicleById(vehicleId);
         if (vehicle == null) {
-            System.out.println("Invalid vehicle ID. Aborting trip creation.");
+            uiUtils.printFailedMessage("Invalid vehicle ID. Aborting trip creation.");
             return;
         }
 
@@ -52,63 +73,47 @@ public class TripServicesAdmin extends AdminBaseServices implements TripCRUD {
         PortServicesAdmin portController = new PortServicesAdmin();
 
         portController.displayAllPorts(); // Display all ports
-        System.out.print("Enter departure port ID: ");
-        String departurePortId = scanner.nextLine();
+        String departurePortId = inputValidation.idValidation("P-", "Enter departure port ID: ");
         Port departurePort = portController.getPortById(departurePortId);
         if (departurePort == null) {
-            System.out.println("Invalid departure port ID. Aborting trip creation.");
+            uiUtils.printFailedMessage("Invalid departure port ID. Aborting trip creation.");
             return;
         }
 
-        System.out.print("Enter arrival port ID: ");
-        String arrivalPortId = scanner.nextLine();
+        String arrivalPortId = inputValidation.idValidation("P-", "Enter arrival port ID: ");
         Port arrivalPort = portController.getPortById(arrivalPortId);
         if (arrivalPort == null) {
-            System.out.println("Invalid arrival port ID. Aborting trip creation.");
+            uiUtils.printFailedMessage("Invalid arrival port ID. Aborting trip creation.");
             return;
         }
 
-        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm");
-        System.out.print("Enter departure date (dd-MM-yyyy HH:mm): ");
+        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+        System.out.print("Enter departure date (dd-MM-yyyy): ");
         Date departureDate;
         try {
             departureDate = sdf.parse(scanner.nextLine());
         } catch (Exception e) {
-            System.out.println("Error parsing date. Please use the correct format.");
+            uiUtils.printFailedMessage("Error parsing date. Please use the correct format.");
             return;
         }
 
         Trip newTrip = new Trip(tripId, vehicle, departurePort, arrivalPort, departureDate);
 
-        List<Trip> tripsList;
-        try {
-            Trip[] tripsArray = (Trip[]) dbHandler.readObjects(TRIP_FILE_PATH);
-            tripsList = new ArrayList<>(Arrays.asList(tripsArray));
-        } catch (Exception e) {
-            tripsList = new ArrayList<>();
-        }
-
+        List<Trip> tripsList = fetchTripsFromDatabase();
         tripsList.add(newTrip);
-
         dbHandler.writeObjects(TRIP_FILE_PATH, tripsList.toArray(new Trip[0]));
-        System.out.println("Trip created successfully!");
+        uiUtils.printSuccessMessage("Trip created successfully!");
     }
 
     private String generateNextTripId() {
-        List<Trip> tripsList;
-        try {
-            Trip[] tripsArray = (Trip[]) dbHandler.readObjects(TRIP_FILE_PATH);
-            tripsList = new ArrayList<>(Arrays.asList(tripsArray));
-        } catch (Exception e) {
-            tripsList = new ArrayList<>();
-        }
+        List<Trip> tripsList = fetchTripsFromDatabase();
 
         if (tripsList.isEmpty()) {
-            return "T001"; // Starting ID
+            return "T-000001"; // Starting ID
         } else {
             String lastTripId = tripsList.get(tripsList.size() - 1).getTripId();
-            int nextId = Integer.parseInt(lastTripId.substring(1)) + 1; // Assuming the ID format is "Txxx"
-            return String.format("T%03d", nextId); // This will format the ID as T001, T002, ...
+            int nextId = Integer.parseInt(lastTripId.substring(2)) + 1;
+            return String.format("T%06d", nextId);
         }
     }
 
@@ -116,33 +121,20 @@ public class TripServicesAdmin extends AdminBaseServices implements TripCRUD {
         String tripId = generateNextTripId();
         Trip newTrip = new Trip(tripId, vehicle, departurePort, arrivalPort, departureDate, arrivalDate, status);
 
-        List<Trip> tripsList;
-        try {
-            Trip[] tripsArray = (Trip[]) dbHandler.readObjects(TRIP_FILE_PATH);
-            tripsList = new ArrayList<>(Arrays.asList(tripsArray));
-        } catch (Exception e) {
-            tripsList = new ArrayList<>();
-        }
-
+        List<Trip> tripsList = fetchTripsFromDatabase();
         tripsList.add(newTrip);
-
         dbHandler.writeObjects(TRIP_FILE_PATH, tripsList.toArray(new Trip[0]));
     }
 
     @Override
     public void findTrip() {
-        System.out.println("DISPLAY TRIP INFO");
-        System.out.print("Enter trip ID: ");
-        String tripIdToDisplay = scanner.nextLine();
+        uiUtils.clearScreen();
 
-        List<Trip> tripsList;
-        try {
-            Trip[] tripsArray = (Trip[]) dbHandler.readObjects(TRIP_FILE_PATH);
-            tripsList = new ArrayList<>(Arrays.asList(tripsArray));
-        } catch (Exception e) {
-            System.out.println("Error reading trips or no trips exist.");
-            return;
-        }
+        uiUtils.printFunctionName("TRIP SEARCH WIZARD", 100);
+
+        String tripIdToDisplay = inputValidation.idValidation("T", "Enter trip ID to search: ");
+
+        List<Trip> tripsList = fetchTripsFromDatabase();
 
         Trip tripToDisplay = null;
         for (Trip trip : tripsList) {
@@ -153,60 +145,50 @@ public class TripServicesAdmin extends AdminBaseServices implements TripCRUD {
         }
 
         if (tripToDisplay != null) {
-            System.out.println("------------------------------------------------------------------------------------------------------------------------------------");
+            uiUtils.printTopBorderWithTableName("TRIP INFO", 10, 20, 20, 20, 20, 20, 20);
             System.out.printf("| %-10s | %-20s | %-20s | %-20s | %-20s | %-20s | %-20s |\n",
                     "Trip ID", "Vehicle", "Departure Port", "Arrival Port", "Departure Date", "Arrival Date", "Status");
-            System.out.println("------------------------------------------------------------------------------------------------------------------------------------");
+            uiUtils.printHorizontalLine(10, 20, 20, 20, 20, 20, 20);
             System.out.printf("| %-10s | %-20s | %-20s | %-20s | %-20s | %-20s | %-20s |\n",
                     tripToDisplay.getTripId(), tripToDisplay.getVehicle().toString(), tripToDisplay.getDeparturePort().getName(),
                     tripToDisplay.getArrivalPort().getName(), sdf.format(tripToDisplay.getDepartureDate()),
                     tripToDisplay.getArrivalDate() != null ? sdf.format(tripToDisplay.getArrivalDate()) : "N/A", tripToDisplay.getStatus());
-            System.out.println("------------------------------------------------------------------------------------------------------------------------------------");
+            uiUtils.printHorizontalLine(10, 20, 20, 20, 20, 20, 20);
         } else {
-            System.out.println("No trip found with the given ID.");
+            uiUtils.printFailedMessage("No trip found with the given ID.");
         }
     }
 
     @Override
     public void displayAllTrips() {
-        System.out.println("DISPLAY ALL TRIPS INFO");
+        uiUtils.clearScreen();
 
-        List<Trip> tripsList;
-        try {
-            Trip[] tripsArray = (Trip[]) dbHandler.readObjects(TRIP_FILE_PATH);
-            tripsList = new ArrayList<>(Arrays.asList(tripsArray));
-        } catch (Exception e) {
-            System.out.println("Error reading trips or no trips exist.");
-            return;
-        }
+        List<Trip> tripsList = fetchTripsFromDatabase();
 
-        System.out.println("------------------------------------------------------------------------------------------------------------------------------------");
+        uiUtils.printTopBorderWithTableName("TRIPS INFORMATION", 10, 20, 20, 20, 20, 20, 20);
         System.out.printf("| %-10s | %-20s | %-20s | %-20s | %-20s | %-20s | %-20s |\n",
                 "Trip ID", "Vehicle", "Departure Port", "Arrival Port", "Departure Date", "Arrival Date", "Status");
-        System.out.println("------------------------------------------------------------------------------------------------------------------------------------");
+        uiUtils.printHorizontalLine(10, 20, 20, 20, 20, 20, 20);
         for (Trip trip : tripsList) {
             System.out.printf("| %-10s | %-20s | %-20s | %-20s | %-20s | %-20s | %-20s |\n",
                     trip.getTripId(), trip.getVehicle().toString(), trip.getDeparturePort().getName(),
                     trip.getArrivalPort().getName(), sdf.format(trip.getDepartureDate()),
                     trip.getArrivalDate() != null ? sdf.format(trip.getArrivalDate()) : "N/A", trip.getStatus());
         }
-        System.out.println("------------------------------------------------------------------------------------------------------------------------------------");
+        uiUtils.printHorizontalLine(10, 20, 20, 20, 20, 20, 20);
     }
 
     @Override
     public void updateTrip() {
-        System.out.println("TRIP UPDATE WIZARD");
-        System.out.print("Enter trip ID to update: ");
-        String tripIdToUpdate = scanner.nextLine();
+        uiUtils.clearScreen();
 
-        List<Trip> tripsList;
-        try {
-            Trip[] tripsArray = (Trip[]) dbHandler.readObjects(TRIP_FILE_PATH);
-            tripsList = new ArrayList<>(Arrays.asList(tripsArray));
-        } catch (Exception e) {
-            System.out.println("Error reading trips or no trips exist.");
-            return;
-        }
+        uiUtils.printFunctionName("TRIP UPDATE WIZARD", 100);
+        System.out.println();
+
+        String tripIdToUpdate = inputValidation.idValidation("T", "Enter trip ID to update:");
+        System.out.println();
+
+        List<Trip> tripsList = fetchTripsFromDatabase();
 
         Trip tripToUpdate = null;
         for (Trip trip : tripsList) {
@@ -217,7 +199,7 @@ public class TripServicesAdmin extends AdminBaseServices implements TripCRUD {
         }
 
         if (tripToUpdate != null) {
-            System.out.print("Enter new arrival date (dd-MM-yyyy HH:mm, leave blank to keep unchanged): ");
+            System.out.print("Enter new arrival date (dd-MM-yyyy, leave blank to keep unchanged): ");
             String arrivalDateStr = scanner.nextLine();
             if (!arrivalDateStr.isEmpty()) {
                 Date arrivalDate;
@@ -225,7 +207,7 @@ public class TripServicesAdmin extends AdminBaseServices implements TripCRUD {
                     arrivalDate = sdf.parse(arrivalDateStr);
                     tripToUpdate.completeTrip(arrivalDate);
                 } catch (ParseException e) {
-                    System.out.println("Error parsing date. Please use the correct format.");
+                    uiUtils.printFailedMessage("Error parsing date. Please use the correct format.");
                 }
             }
 
@@ -236,26 +218,23 @@ public class TripServicesAdmin extends AdminBaseServices implements TripCRUD {
             }
 
             dbHandler.writeObjects(TRIP_FILE_PATH, tripsList.toArray(new Trip[0]));
-            System.out.println("Trip updated successfully!");
+            uiUtils.printSuccessMessage("Trip updated successfully!");
         } else {
-            System.out.println("No trip found with the given ID.");
+            uiUtils.printFailedMessage("No trip found with the given ID.");
         }
     }
 
     @Override
     public void deleteTrip() {
-        System.out.println("DELETE TRIP");
-        System.out.print("Enter trip ID to delete: ");
-        String tripIdToDelete = scanner.nextLine();
+        uiUtils.clearScreen();
 
-        List<Trip> tripsList;
-        try {
-            Trip[] tripsArray = (Trip[]) dbHandler.readObjects(TRIP_FILE_PATH);
-            tripsList = new ArrayList<>(Arrays.asList(tripsArray));
-        } catch (Exception e) {
-            System.out.println("Error reading trips or no trips exist.");
-            return;
-        }
+        uiUtils.printFunctionName("TRIP DELETION WIZARD", 100);
+        System.out.println();
+
+        String tripIdToDelete = inputValidation.idValidation("T", "Enter trip ID to delete: ");
+        System.out.println();
+
+        List<Trip> tripsList = fetchTripsFromDatabase();
 
         Trip tripToDelete = null;
         for (Trip trip : tripsList) {
@@ -268,21 +247,14 @@ public class TripServicesAdmin extends AdminBaseServices implements TripCRUD {
         if (tripToDelete != null) {
             tripsList.remove(tripToDelete);
             dbHandler.writeObjects(TRIP_FILE_PATH, tripsList.toArray(new Trip[0]));
-            System.out.println("Trip deleted successfully!");
+            uiUtils.printSuccessMessage("Trip deleted successfully!");
         } else {
-            System.out.println("No trip found with the given ID.");
+            uiUtils.printFailedMessage("No trip found with the given ID.");
         }
     }
 
     public boolean vehicleAvailCheck(Vehicle vehicle) {
-        List<Trip> tripsList;
-        try {
-            Trip[] tripsArray = (Trip[]) dbHandler.readObjects(TRIP_FILE_PATH);
-            tripsList = new ArrayList<>(Arrays.asList(tripsArray));
-        } catch (Exception e) {
-            System.out.println("Error reading trips or no trips exist.");
-            return false;
-        }
+        List<Trip> tripsList = fetchTripsFromDatabase();
 
         for (Trip trip : tripsList) {
             if (trip.getVehicle().equals(vehicle)) {

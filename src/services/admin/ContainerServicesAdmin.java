@@ -1,11 +1,26 @@
+/*
+  RMIT University Vietnam
+  Course: COSC2081 Programming 1
+  Semester: 2023B
+  Assessment: Group Assignment
+  Group: Team Hi
+  Members:
+  Phan Nhat Minh - s3978598
+  Huynh Duc Gia Tin - s3962053
+  Nguyen Viet Ha - s3978128
+  Vu Minh Ha - s3978681
+  Created  date: 02/09/2023
+  Acknowledgement: chat.openai.com, stackoverflow.com, geeksforgeeks.org, javatpoint.com, tutorialspoint.com, oracle.com, w3schools.com, github.com
+*/
+
 package services.admin;
 
 import exceptions.InputValidation;
-import models.port.Port;
 import utils.Constants;
 import database.DatabaseHandler;
 import models.container.*;
 import interfaces.CRUD.ContainerCRUD;
+import utils.UiUtils;
 
 import java.util.*;
 
@@ -15,6 +30,7 @@ public class ContainerServicesAdmin extends AdminBaseServices implements Contain
     private final String CONTAINER_FILE_PATH = Constants.CONTAINER_FILE_PATH;
     private final DatabaseHandler dbHandler = new DatabaseHandler();
     private final InputValidation inputValidation = new InputValidation();
+    private final UiUtils uiUtils = new UiUtils();
 
     // Modularized method to fetch containers from the database
     public List<Container> fetchContainersFromDatabase() {
@@ -22,7 +38,7 @@ public class ContainerServicesAdmin extends AdminBaseServices implements Contain
             Container[] containersArray = (Container[]) dbHandler.readObjects(CONTAINER_FILE_PATH);
             return new ArrayList<>(Arrays.asList(containersArray));
         } catch (Exception e) {  // Catching a generic exception as a placeholder.
-            System.out.println("Error reading containers or no containers exist.");
+            uiUtils.printFailedMessage("Error reading containers from the database.");
             return new ArrayList<>();
         }
     }
@@ -41,21 +57,27 @@ public class ContainerServicesAdmin extends AdminBaseServices implements Contain
 
     @Override
     public void createNewContainer() {
-        System.out.println("CONTAINER CREATE WIZARD");
-        System.out.print("Enter container ID: ");
-        String containerId = inputValidation.idValidation("C-");
-        System.out.print("Enter container weight: ");
-        double weight = scanner.nextDouble();
+        uiUtils.clearScreen();
+
+        uiUtils.printFunctionName("CONTAINER CREATION WIZARD", 100);
+        System.out.println();
+
+        String containerId = inputValidation.idValidation("C-", "Enter container ID to create: ");
+        System.out.println();
+
+        double weight = inputValidation.getDouble("Enter container weight:");
+        System.out.println();
+
         System.out.println("Select container type:");
         System.out.println("1. Dry storage");
         System.out.println("2. Open Side");
         System.out.println("3. Open Top");
         System.out.println("4. Liquid");
         System.out.println("5. Refrigerated");
-        System.out.print("Enter your choice: ");
-        int choice = scanner.nextInt();
-        scanner.nextLine();  // To consume any leftover newline
-        Container newContainer = null;
+        int choice = inputValidation.getInt("Enter your choice: ");
+        scanner.nextLine();
+
+        Container newContainer;
         switch (choice) {
             case 1 -> newContainer = new DryStorage(containerId, weight);
             case 2 -> newContainer = new OpenSide(containerId, weight);
@@ -71,42 +93,70 @@ public class ContainerServicesAdmin extends AdminBaseServices implements Contain
         List<Container> containerList = fetchContainersFromDatabase();
         containerList.add(newContainer);
         writeContainersToDatabase(containerList);
+
+        uiUtils.printSuccessMessage("Container with ID " + containerId + " created successfully.");
     }
 
     @Override
     public void findContainer() {
-        System.out.println("DISPLAY CONTAINER INFO");
-        System.out.print("Enter container ID: ");
-        String containerIdToDisplay = inputValidation.idValidation("C-");
-        List<Container> containerList = fetchContainersFromDatabase();
+        uiUtils.clearScreen();
+
+        uiUtils.printFunctionName("CONTAINER SEARCH WIZARD", 100);
+        System.out.println();
+
+        String containerIdToDisplay = inputValidation.idValidation("C-", "Enter container ID to search: ");
+        System.out.println();
+
         Optional<Container> optionalContainer = findContainerById(containerIdToDisplay);
+
         if (optionalContainer.isPresent()) {
             Container containerToDisplay = optionalContainer.get();
-            displayContainerTableHeader();
+            uiUtils.printTopBorderWithTableName("CONTAINER INFO", 15, 20, 15, 20);
+            System.out.printf("| %-15s | %-20s | %-15s | %-20s |\n", "Container ID", "Container Type", "Weight", "Current Location");
             displayContainerTableRow(containerToDisplay);
-            System.out.println("--------------------------------------------------------------------------------------");
+            uiUtils.printHorizontalLine(15, 20, 15, 20);
         } else {
-            System.out.println("No container found with the given ID.");
+            uiUtils.printFailedMessage("No container found with the given ID.");
         }
     }
 
     @Override
     public void displayAllContainers() {
-        System.out.println("DISPLAY ALL CONTAINERS INFO");
+        uiUtils.clearScreen();
+
+        uiUtils.printFunctionName("CONTAINERS INFORMATION", 100);
+        System.out.println();
 
         List<Container> containerList = fetchContainersFromDatabase();
-        displayContainerTableHeader();
+        uiUtils.printTopBorderWithTableName("CONTAINERS INFO", 15, 20, 15, 20);
+        System.out.printf("| %-15s | %-20s | %-15s | %-20s |\n", "Container ID", "Container Type", "Weight", "Current Location");
         for (Container container : containerList) {
             displayContainerTableRow(container);
         }
-        System.out.println("--------------------------------------------------------------------------------------");
+        uiUtils.printHorizontalLine(15, 20, 15, 20);
+    }
+
+    public void displayContainerTableRow(Container container) {
+        if (container.getCurrentPort() == null) {
+            System.out.printf("| %-15s | %-20s | %-15.2f | %-20s |\n",
+                    container.getContainerId(), container.getContainerType(),
+                    container.getWeight(), "N/A");
+        } else {
+            System.out.printf("| %-15s | %-20s | %-15.2f | %-20s |\n",
+                    container.getContainerId(), container.getContainerType(),
+                    container.getWeight(), container.getLocation());
+        }
     }
 
     @Override
     public void updateContainer() {
-        System.out.println("CONTAINER UPDATE WIZARD");
-        System.out.print("Enter container ID to update: ");
-        String containerIdToUpdate = inputValidation.idValidation("C-");
+        uiUtils.clearScreen();
+
+        uiUtils.printFunctionName("CONTAINER UPDATE WIZARD", 100);
+        System.out.println();
+
+        String containerIdToUpdate = inputValidation.idValidation("C-", "Enter container ID to update: ");
+        System.out.println();
 
         List<Container> containerList = fetchContainersFromDatabase();
 
@@ -143,7 +193,7 @@ public class ContainerServicesAdmin extends AdminBaseServices implements Contain
                     case 4 -> containerToUpdate = new Liquid(containerIdToUpdate, newWeight);
                     case 5 -> containerToUpdate = new Refrigerated(containerIdToUpdate, newWeight);
                     default -> {
-                        System.out.println("Invalid choice.");
+                        uiUtils.printFailedMessage("Invalid choice.");
                         return;
                     }
                 }
@@ -153,27 +203,24 @@ public class ContainerServicesAdmin extends AdminBaseServices implements Contain
             }
 
             dbHandler.writeObjects(CONTAINER_FILE_PATH, containerList.toArray(new Container[0]));
-            System.out.println("Container with ID " + containerIdToUpdate + " updated successfully.");
+            uiUtils.printSuccessMessage("Container with ID " + containerIdToUpdate + " updated successfully.");
         } else {
-            System.out.println("No container found with the given ID.");
+            uiUtils.printFailedMessage("No container found with the given ID.");
         }
     }
 
 
     @Override
     public void deleteContainer() {
-        System.out.println("CONTAINER DELETE WIZARD");
-        System.out.print("Enter container ID to delete: ");
-        String containerIdToDelete = scanner.nextLine();
+        uiUtils.clearScreen();
 
-        List<Container> containerList;
-        try {
-            Container[] containersArray = (Container[]) dbHandler.readObjects(CONTAINER_FILE_PATH);
-            containerList = new ArrayList<>(Arrays.asList(containersArray));
-        } catch (Exception e) {
-            System.out.println("Error reading containers or no containers exist.");
-            return;
-        }
+        uiUtils.printFunctionName("CONTAINER DELETE WIZARD", 100);
+        System.out.println();
+
+        String containerIdToDelete = inputValidation.idValidation("C-", "Enter container ID to delete: ");
+        System.out.println();
+
+        List<Container> containerList = fetchContainersFromDatabase();
 
         boolean isDeleted = false;
         Iterator<Container> iterator = containerList.iterator();
@@ -188,9 +235,9 @@ public class ContainerServicesAdmin extends AdminBaseServices implements Contain
 
         if (isDeleted) {
             dbHandler.writeObjects(CONTAINER_FILE_PATH, containerList.toArray(new Container[0]));
-            System.out.println("Container with ID " + containerIdToDelete + " deleted successfully.");
+            uiUtils.printSuccessMessage("Container with ID " + containerIdToDelete + " deleted successfully.");
         } else {
-            System.out.println("No container found with the given ID.");
+            uiUtils.printFailedMessage("No container found with the given ID.");
         }
     }
 
