@@ -30,9 +30,18 @@ public class InputValidation {
         }
     }
 
-    public String idValidation(String prefix) {
-        String prompt = getPromptForPrefix(prefix);
+    public int getInt(String prompt) {
+        while (true) {
+            System.out.print(prompt);
+            try {
+                return Integer.parseInt(scanner.nextLine());
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input. Please enter a valid integer value.");
+            }
+        }
+    }
 
+    public String idValidation(String prefix, String prompt) {
         while (true) {
             System.out.print(prompt);
             String input = scanner.nextLine().trim();
@@ -45,28 +54,28 @@ public class InputValidation {
                     System.out.println("Invalid ID. Please ensure the ID after the prefix consists of 6 digits.");
                 }
             } else {
-                System.out.println("Invalid ID format. Please ensure the ID starts with the prefix and is followed by 6 digits.");
+                System.out.println("Invalid ID format. Please ensure the ID starts with " + prefix + " and is followed by 6 digits.");
             }
         }
-    }
-
-    private String getPromptForPrefix(String prefix) {
-        String entityType = switch (prefix) {
-            case "P-" -> "Port";
-            case "C-" -> "Container";
-            case "S-" -> "Ship";
-            case "V-" -> "Vehicle";
-            case "L-" -> "Trip";
-            default -> "Entity"; // Default entity type if the prefix doesn't match any known types
-        };
-
-        return "Input " + entityType + " ID: ";
     }
 
     public String getString(String prompt) {
         while (true) {
             System.out.print(prompt);
             String input = scanner.nextLine().trim().toUpperCase();
+
+            if (!input.isEmpty()) {
+                return input;
+            } else {
+                System.out.println("Invalid input. Please enter a non-empty string.");
+            }
+        }
+    }
+
+    public String getUserInfo(String prompt) {
+        while (true) {
+            System.out.print(prompt);
+            String input = scanner.nextLine().trim();
 
             if (!input.isEmpty()) {
                 return input;
