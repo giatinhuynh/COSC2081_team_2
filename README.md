@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="logo/RMIT_University_Logo.png" alt="RMIT Logo" width="300" height="100">
+  <img src="logo/RMIT_University_Logo.png" alt="RMIT Logo" width="300" height="auto">
 </p>
 
 # Port Management System
