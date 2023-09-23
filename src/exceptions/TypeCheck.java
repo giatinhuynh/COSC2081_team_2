@@ -17,4 +17,13 @@ public class TypeCheck {
     public boolean isString(String input) {
         return !isDouble(input) && !isBoolean(input);
     }
+
+    public boolean isInt(String input) {
+        try {
+            Integer.parseInt(input);
+            return true;
+        } catch (NumberFormatException ex) {
+            return false;
+        }
+    }
 }

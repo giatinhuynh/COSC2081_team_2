@@ -45,7 +45,7 @@ public abstract class BaseView {
     }
 
     protected void backToMenu() {
-        System.out.print("Press enter to go continue...");
+        System.out.print("Press enter to continue...");
         scanner.nextLine();
         scanner.nextLine();
     }

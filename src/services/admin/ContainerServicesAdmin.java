@@ -16,6 +16,7 @@
 package services.admin;
 
 import exceptions.InputValidation;
+import exceptions.TypeCheck;
 import utils.Constants;
 import database.DatabaseHandler;
 import models.container.*;
@@ -31,6 +32,7 @@ public class ContainerServicesAdmin extends AdminBaseServices implements Contain
     private final DatabaseHandler dbHandler = new DatabaseHandler();
     private final InputValidation inputValidation = new InputValidation();
     private final UiUtils uiUtils = new UiUtils();
+    private final TypeCheck typeCheck = new TypeCheck();
 
     // Modularized method to fetch containers from the database
     public List<Container> fetchContainersFromDatabase() {
@@ -55,6 +57,17 @@ public class ContainerServicesAdmin extends AdminBaseServices implements Contain
                 .findFirst();
     }
 
+    public boolean uniqueContainerIdCheck(String containerId) {
+        if (findContainerById(containerId).isPresent()) {
+            uiUtils.printFailedMessage("Container with ID " + containerId + " already exists.");
+            System.out.println("Press enter to try again...");
+            scanner.nextLine();
+            return false;
+        }
+        return true;
+    }
+
+
     @Override
     public void createNewContainer() {
         uiUtils.clearScreen();
@@ -63,30 +76,49 @@ public class ContainerServicesAdmin extends AdminBaseServices implements Contain
         System.out.println();
 
         String containerId = inputValidation.idValidation("C-", "Enter container ID to create: ");
+        if (!uniqueContainerIdCheck(containerId)) {
+            return;  // Exit the creation process if the ID is not unique
+        }
         System.out.println();
 
         double weight = inputValidation.getDouble("Enter container weight:");
         System.out.println();
 
-        System.out.println("Select container type:");
-        System.out.println("1. Dry storage");
-        System.out.println("2. Open Side");
-        System.out.println("3. Open Top");
-        System.out.println("4. Liquid");
-        System.out.println("5. Refrigerated");
-        int choice = inputValidation.getInt("Enter your choice: ");
-        scanner.nextLine();
+        Container newContainer = null;
+        boolean continuePrompt = true;
 
-        Container newContainer;
-        switch (choice) {
-            case 1 -> newContainer = new DryStorage(containerId, weight);
-            case 2 -> newContainer = new OpenSide(containerId, weight);
-            case 3 -> newContainer = new OpenTop(containerId, weight);
-            case 4 -> newContainer = new Liquid(containerId, weight);
-            case 5 -> newContainer = new Refrigerated(containerId, weight);
-            default -> {
-                System.out.println("Invalid choice.");
-                return;
+        while(continuePrompt) {
+            System.out.println("Select container type:");
+            System.out.println("1. Dry storage");
+            System.out.println("2. Open Side");
+            System.out.println("3. Open Top");
+            System.out.println("4. Liquid");
+            System.out.println("5. Refrigerated");
+            int choice = inputValidation.getInt("Enter your choice: ");
+
+            switch (choice) {
+                case 1:
+                    newContainer = new DryStorage(containerId, weight);
+                    continuePrompt = false;
+                    break;
+                case 2:
+                    newContainer = new OpenSide(containerId, weight);
+                    continuePrompt = false;
+                    break;
+                case 3:
+                    newContainer = new OpenTop(containerId, weight);
+                    continuePrompt = false;
+                    break;
+                case 4:
+                    newContainer = new Liquid(containerId, weight);
+                    continuePrompt = false;
+                    break;
+                case 5:
+                    newContainer = new Refrigerated(containerId, weight);
+                    continuePrompt = false;
+                    break;
+                default:
+                    System.out.println("Invalid choice. Please try again.");
             }
         }
 
@@ -172,8 +204,14 @@ public class ContainerServicesAdmin extends AdminBaseServices implements Contain
 
         if (containerToUpdate != null) {
             System.out.print("Enter new container weight (leave blank to keep unchanged): ");
-            String weightStr = scanner.nextLine();
-            double newWeight = !weightStr.isEmpty() ? Double.parseDouble(weightStr) : containerToUpdate.getWeight();
+            String newWeight = scanner.nextLine();
+            if (!newWeight.isEmpty()) {
+                if (typeCheck.isDouble(newWeight)) {
+                    containerToUpdate.setWeight(Double.parseDouble(newWeight));
+                    return;
+                }
+            }
+
 
             System.out.println("Select new container type (or leave blank to keep unchanged):");
             System.out.println("1. Dry storage");
@@ -185,21 +223,25 @@ public class ContainerServicesAdmin extends AdminBaseServices implements Contain
             String typeChoiceStr = scanner.nextLine();
 
             if (!typeChoiceStr.isEmpty()) {
+                if (!typeCheck.isInt(typeChoiceStr)) {
+                    uiUtils.printFailedMessage("Invalid choice.");
+                    return;
+                }
                 int typeChoice = Integer.parseInt(typeChoiceStr);
                 switch (typeChoice) {
-                    case 1 -> containerToUpdate = new DryStorage(containerIdToUpdate, newWeight);
-                    case 2 -> containerToUpdate = new OpenSide(containerIdToUpdate, newWeight);
-                    case 3 -> containerToUpdate = new OpenTop(containerIdToUpdate, newWeight);
-                    case 4 -> containerToUpdate = new Liquid(containerIdToUpdate, newWeight);
-                    case 5 -> containerToUpdate = new Refrigerated(containerIdToUpdate, newWeight);
+                    case 1 -> containerToUpdate = new DryStorage(containerIdToUpdate, Double.parseDouble(newWeight));
+                    case 2 -> containerToUpdate = new OpenSide(containerIdToUpdate, Double.parseDouble(newWeight));
+                    case 3 -> containerToUpdate = new OpenTop(containerIdToUpdate, Double.parseDouble(newWeight));
+                    case 4 -> containerToUpdate = new Liquid(containerIdToUpdate, Double.parseDouble(newWeight));
+                    case 5 -> containerToUpdate = new Refrigerated(containerIdToUpdate, Double.parseDouble(newWeight));
                     default -> {
                         uiUtils.printFailedMessage("Invalid choice.");
                         return;
                     }
                 }
                 containerList.set(indexToUpdate, containerToUpdate);  // Replace the old container with the updated one
-            } else if (!weightStr.isEmpty()) {
-                containerToUpdate.setWeight(newWeight);
+            } else if (!newWeight.isEmpty()) {
+                containerToUpdate.setWeight(Double.parseDouble(newWeight));
             }
 
             dbHandler.writeObjects(CONTAINER_FILE_PATH, containerList.toArray(new Container[0]));

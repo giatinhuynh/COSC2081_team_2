@@ -65,7 +65,7 @@ public class PortServicesAdmin extends AdminBaseServices implements PortCRUD {
         uiUtils.printFunctionName("PORT CREATION WIZARD", 100);
         System.out.println();  // Blank line for spacing
 
-        String portId = inputValidation.idValidation("P-", "Enter port ID to create: ");
+        String portId = inputValidation.idValidation("P", "Enter port ID to create: ");
         System.out.println();  // Blank line for spacing
 
         String name = inputValidation.getString("Enter port name: ");
@@ -100,7 +100,7 @@ public class PortServicesAdmin extends AdminBaseServices implements PortCRUD {
         uiUtils.printFunctionName("PORT SEARCH WIZARD", 100);
         System.out.println();
 
-        String portIdToDisplay = inputValidation.idValidation("P-", "Enter port ID to search: ");
+        String portIdToDisplay = inputValidation.idValidation("P", "Enter port ID to search: ");
         System.out.println();
 
         Optional<Port> optionalPort = findPortById(portIdToDisplay);
@@ -147,8 +147,9 @@ public class PortServicesAdmin extends AdminBaseServices implements PortCRUD {
         uiUtils.clearScreen();
 
         uiUtils.printFunctionName("PORT UPDATE WIZARD", 100);
+        System.out.println();
 
-        String portIdToUpdate = inputValidation.idValidation("P-", "Enter port ID to update: ");
+        String portIdToUpdate = inputValidation.idValidation("P", "Enter port ID to update: ");
         System.out.println();
 
         List<Port> portsList = fetchPortsFromDatabase();
@@ -202,7 +203,7 @@ public class PortServicesAdmin extends AdminBaseServices implements PortCRUD {
                 }
             }
 
-            writePortsToDatabase(portsList);
+            updatePortInDatabase(portToUpdate);
             uiUtils.printSuccessMessage("Port with ID " + portIdToUpdate + " updated successfully.");
         } else {
             uiUtils.printFailedMessage("No port found with the given ID.");
@@ -215,8 +216,9 @@ public class PortServicesAdmin extends AdminBaseServices implements PortCRUD {
         uiUtils.clearScreen();
 
         uiUtils.printFunctionName("PORT DELETION WIZARD", 100);
+        System.out.println();
 
-        String portIdToDelete = inputValidation.idValidation("P-", "Enter port ID to delete: ");
+        String portIdToDelete = inputValidation.idValidation("P", "Enter port ID to delete: ");
         System.out.println();
 
         List<Port> portsList = fetchPortsFromDatabase();

@@ -63,13 +63,25 @@ public class UserServicesAdmin extends AdminBaseServices implements UserCRUD {
         PortServicesAdmin portController = new PortServicesAdmin();
         Port managedPort = portController.getPortById(managedPortId);
 
-        PortManager newPortManager = new PortManager(username, password, managedPort);
+        if (managedPort == null) {
+            System.out.println("There is no port with ID " + managedPortId + " in the system, please try again.");
+            return;
+        }
 
         List<PortManager> managersList = fetchManagersFromDatabase();
+        for (PortManager manager : managersList) {
+            if (manager.getManagedPort().getPortId().equals(managedPortId)) {
+                System.out.println("The port with ID " + managedPortId + " already has a manager assigned. Please try again.");
+                return;
+            }
+        }
+
+        PortManager newPortManager = new PortManager(username, password, managedPort);
         managersList.add(newPortManager);
         dbHandler.writeObjects(USER_FILE_PATH, managersList.toArray(new PortManager[0]));
         uiUtils.printSuccessMessage("Port Manager for port " + portController.getPortById(managedPortId).getName() + " created successfully.");
     }
+
 
     @Override
     public void findUser() {

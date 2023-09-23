@@ -87,6 +87,12 @@ public class TripServicesAdmin extends AdminBaseServices implements TripCRUD {
             return;
         }
 
+        // Check if departure and arrival ports are the same
+        if (departurePortId.equals(arrivalPortId)) {
+            uiUtils.printFailedMessage("Departure and arrival ports cannot be the same. Aborting trip creation.");
+            return;
+        }
+
         SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
         System.out.print("Enter departure date (dd-MM-yyyy): ");
         Date departureDate;
@@ -104,6 +110,7 @@ public class TripServicesAdmin extends AdminBaseServices implements TripCRUD {
         dbHandler.writeObjects(TRIP_FILE_PATH, tripsList.toArray(new Trip[0]));
         uiUtils.printSuccessMessage("Trip created successfully!");
     }
+
 
     private String generateNextTripId() {
         List<Trip> tripsList = fetchTripsFromDatabase();
