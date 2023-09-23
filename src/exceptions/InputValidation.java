@@ -46,18 +46,19 @@ public class InputValidation {
             System.out.print(prompt);
             String input = scanner.nextLine().trim();
 
-            if (input.startsWith(prefix) && input.length() == prefix.length() + 6) {
+            if (input.startsWith(prefix + "-") && input.length() == prefix.length() + 7) {
                 try {
-                    Long.parseLong(input.substring(prefix.length())); // Check if the remaining part is a valid 6-digit number
+                    Long.parseLong(input.substring(prefix.length() + 1)); // Check if the remaining part is a valid 6-digit number
                     return input;
                 } catch (NumberFormatException e) {
                     System.out.println("Invalid ID. Please ensure the ID after the prefix consists of 6 digits.");
                 }
             } else {
-                System.out.println("Invalid ID format. Please ensure the ID starts with " + prefix + " and is followed by 6 digits.");
+                System.out.println("Invalid ID format. Please ensure the ID starts with " + prefix + "- and is followed by 6 digits.");
             }
         }
     }
+
 
     public String getString(String prompt) {
         while (true) {
