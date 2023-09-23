@@ -305,4 +305,26 @@ public class VehicleServicesAdmin extends AdminBaseServices implements VehicleCR
         }
         uiUtils.printHorizontalLine(15, 20, 20, 25, 20, 15, 15);
     }
+
+    public void updateVehicleInDatabase(Vehicle vehicleToUpdate) {
+        // Load all vehicles from the database
+        List<Vehicle> vehicleList = fetchVehiclesFromDatabase();
+
+        // Find the index of the vehicle to update
+        int indexToUpdate = -1;
+        for (int i = 0; i < vehicleList.size(); i++) {
+            if (vehicleList.get(i).getVehicleId().equals(vehicleToUpdate.getVehicleId())) {
+                indexToUpdate = i;
+                break;
+            }
+        }
+
+        // If vehicle was found in the list, replace it with the updated one and save back to the database
+        if (indexToUpdate != -1) {
+            vehicleList.set(indexToUpdate, vehicleToUpdate);
+
+            // Save the updated list of vehicles back to the database
+            dbHandler.writeObjects(VEHICLE_FILE_PATH, vehicleList.toArray(new Vehicle[0]));
+        }
+    }
 }

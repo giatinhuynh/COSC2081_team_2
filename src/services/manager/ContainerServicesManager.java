@@ -1,6 +1,7 @@
 package services.manager;
 
 import database.DatabaseHandler;
+import exceptions.InputValidation;
 import interfaces.CRUD.ContainerCRUD;
 import interfaces.manager.ManagerContainerInterface;
 import models.container.*;
@@ -8,7 +9,9 @@ import models.port.Port;
 import models.user.PortManager;
 import models.vehicle.Ship;
 import models.vehicle.Vehicle;
+import services.admin.ContainerServicesAdmin;
 import services.admin.PortServicesAdmin;
+import services.admin.VehicleServicesAdmin;
 import utils.Constants;
 import utils.CurrentUser;
 import utils.UiUtils;
@@ -17,12 +20,15 @@ import java.util.*;
 
 public class ContainerServicesManager extends ManagerBaseServices implements ContainerCRUD, ManagerContainerInterface {
 
-    private final PortServicesAdmin portServices = new PortServicesAdmin();
+    private final PortServicesAdmin portServicesAdmin = new PortServicesAdmin();
+    private final ContainerServicesAdmin containerServicesAdmin = new ContainerServicesAdmin();
+    private final VehicleServicesAdmin vehicleServicesAdmin = new VehicleServicesAdmin();
     private final Port managedPort;
     private final Scanner scanner = new Scanner(System.in);
     private final String CONTAINER_FILE_PATH = Constants.CONTAINER_FILE_PATH;
     private final DatabaseHandler dbHandler = new DatabaseHandler();
     private final UiUtils uiUtils = new UiUtils();
+    private final InputValidation inputValidation = new InputValidation();
 
     public ContainerServicesManager() {
         if (CurrentUser.getUser() instanceof PortManager) {
@@ -38,55 +44,82 @@ public class ContainerServicesManager extends ManagerBaseServices implements Con
             Container[] containersArray = (Container[]) dbHandler.readObjects(CONTAINER_FILE_PATH);
             return new ArrayList<>(Arrays.asList(containersArray));
         } catch (Exception e) {  // Catching a generic exception as a placeholder.
-            System.out.println("Error reading containers or no containers exist.");
+            uiUtils.printFailedMessage("Error reading containers or no containers exist.");
             return new ArrayList<>();
         }
     }
 
+    // Modularized method to write containers to the database
+    private void writeContainersToDatabase(List<Container> containersList) {
+        dbHandler.writeObjects(CONTAINER_FILE_PATH, containersList.toArray(new Container[0]));
+    }
+
     public void loadContainerFlow() {
+        uiUtils.clearScreen();
+
+        uiUtils.printFunctionName("LOAD CONTAINER WIZARD", 100);
+        System.out.println();
+
         // Display all containers at the managed port
-        System.out.println("Containers at your port:");
-        System.out.println("--------------------------------------------------------------------------------------");
-        System.out.printf("| %-15s | %-20s | %-15s |\n", "Container ID", "Container Type", "Weight");
-        System.out.println("--------------------------------------------------------------------------------------");
+        uiUtils.printTopBorderWithTableName("ALL CONTAINERS AT YOUR PORT", 15, 20, 15);
+        uiUtils.printHorizontalLine(15, 20 ,15);
+        System.out.printf("| %-15s | %-20s | %-15s |\n",
+                "Container ID", "Container Type", "Weight");
+        uiUtils.printHorizontalLine(15, 20 ,15);
         for (Container container : managedPort.getCurrentContainers()) {
             System.out.printf("| %-15s | %-20s | %-15.2f |\n", container.getContainerId(), container.getContainerType(), container.getWeight());
         }
-        System.out.println("--------------------------------------------------------------------------------------");
-
+        uiUtils.printHorizontalLine(15, 20 ,15);
+        System.out.println();
 
         // Get input for container id
-        System.out.println("Enter the container ID you want to load:");
-        String containerId = scanner.nextLine();
+        String containerId = inputValidation.idValidation("C", "Enter container ID you want to load: ");
+        System.out.println();
         Container selectedContainer = findContainerById(containerId);
 
         // Show all ports except manager's port
-        System.out.println("Available destination ports:");
-        portServices.displayAllPorts();
+        List<Port> portsList = portServicesAdmin.fetchPortsFromDatabase();
+        uiUtils.printTopBorderWithTableName("AVAILABLE DESTINATION PORTS", 10, 30, 10, 10, 25, 25);
+        System.out.printf("| %-10s | %-30s | %-10s | %-10s | %-25s | %-25s |\n",
+                "Port ID", "Name", "Latitude", "Longitude", "Storing Capacity (kg)", "Landing Ability (T/F)");
+        uiUtils.printHorizontalLine(10, 30, 10, 10, 25, 25);
+        for (Port port : portsList) {
+            if (port.getPortId().equals(managedPort.getPortId())) {
+                continue;
+            }
+            System.out.printf("| %-10s | %-30s | %-10.4f | %-10.4f | %,-25.2f | %-25b |\n",
+                    port.getPortId(), port.getName(), port.getLatitude(), port.getLongitude(),
+                    port.getStoringCapacity(), port.getLandingAbility());
+        }
+        uiUtils.printHorizontalLine(10, 30, 10, 10, 25, 25);
 
         // Get input for destination port
-        System.out.println("Enter the destination port ID:");
-        String portId = scanner.nextLine();
+        String portId = inputValidation.idValidation("P", "Enter the destination port ID: ");
+        System.out.println();
         Port destinationPort = findPortById(portId);
 
         // Based on chosen container and port, display possible vehicles
-        for (Vehicle vehicle : managedPort.getCurrentVehicles()) {
-            assert destinationPort != null;
-            if ((destinationPort.getLandingAbility() || vehicle instanceof Ship) && vehicle.canCarry(selectedContainer) && vehicle.canMoveToPort(destinationPort)) {
-                System.out.println(vehicle.getVehicleId() + " - " + vehicle.getName());
+        List<Vehicle> vehicleList = vehicleServicesAdmin.fetchVehiclesFromDatabase();
+        uiUtils.printTopBorderWithTableName("AVAILABLE VEHICLES", 15, 20);
+        for (Vehicle vehicle : vehicleList) {
+            if (vehicle.getCurrentPort().getPortId().equals(managedPort.getPortId())) {
+                if ((destinationPort.getLandingAbility() || vehicle instanceof Ship) && vehicle.canCarry(selectedContainer) && vehicle.canMoveToPort(destinationPort)) {
+                    System.out.printf("| %-15s | %-20s |\n" , vehicle.getVehicleId(), vehicle.getName());
+                }
             }
         }
+        uiUtils.printHorizontalLine(15, 20);
 
         // Get input for vehicle choice
-        System.out.println("Enter the vehicle ID you want to use:");
-        String vehicleId = scanner.nextLine();
+        String vehicleId = inputValidation.idValidation("V", "Enter the vehicle ID you want to use: ");
+        System.out.println();
         Vehicle selectedVehicle = findVehicleById(vehicleId);
 
-        assert selectedVehicle != null;
+        // Check if the vehicle has enough fuel
         if (selectedVehicle.getCurrentFuel() < selectedVehicle.calculateFuelNeeded(destinationPort)) {
-            System.out.println("Vehicle needs refueling. Do you want to refuel? (yes/no)");
+            System.out.println("Vehicle needs refueling. Do you want to refuel? (y/n)");
             String refuelChoice = scanner.nextLine();
-            if ("yes".equalsIgnoreCase(refuelChoice)) {
+            if ("y".equalsIgnoreCase(refuelChoice)) {
                 selectedVehicle.refuel();
             } else {
                 loadContainerFlow();
@@ -95,45 +128,121 @@ public class ContainerServicesManager extends ManagerBaseServices implements Con
         }
 
         selectedVehicle.loadContainer(selectedContainer);
-        System.out.println("Container loaded successfully!");
+        selectedContainer.setCurrentVehicle(selectedVehicle);
+
+
+        vehicleServicesAdmin.updateVehicleInDatabase(selectedVehicle);
+        containerServicesAdmin.updateContainerInDatabase(selectedContainer);
+        uiUtils.printSuccessMessage("Container loaded successfully!");
     }
 
 
     public void unloadContainerFlow() {
-        // Display all loaded containers at the port
-        System.out.println("Loaded containers at your port:");
-        for (Container container : managedPort.getCurrentContainers()) {
-            if (container.getCurrentVehicle() != null) {
-                System.out.println(container.getContainerId() + " - " + container.getContainerType());
+        uiUtils.clearScreen();
+
+        uiUtils.printFunctionName("UNLOAD CONTAINER WIZARD", 100);
+        System.out.println();
+
+
+        // Display all loaded containers at the managed port
+        List<Container> containerList = fetchContainersFromDatabase();
+        uiUtils.printTopBorderWithTableName("LOADED CONTAINERS", 15, 20, 15);
+        System.out.printf("| %-15s | %-20s | %-15s |\n", "Container ID", "Container Type", "Weight");
+        uiUtils.printHorizontalLine(15, 20, 15);
+        for (Container container : containerList) {
+            if (container.getCurrentPort().getName().equals(managedPort.getName())) {
+                if (container.getCurrentVehicle() != null) {
+                    System.out.printf("| %-15s | %-20s | %-15.2f |\n", container.getContainerId(), container.getContainerType(), container.getWeight());
+                }
+            }
+        }
+        uiUtils.printHorizontalLine(15, 20, 15);
+        System.out.println();
+
+        // Get input for container id
+        String containerId = inputValidation.idValidation("C", "Enter container ID you want to unload: ");
+        System.out.println();
+        Container selectedContainer = findContainerById(containerId);
+
+        Vehicle vehicle = selectedContainer.getCurrentVehicle();
+
+        vehicle.unloadContainer(selectedContainer);
+        selectedContainer.setCurrentVehicle(null);
+        selectedContainer.setCurrentPort(managedPort);
+
+        vehicleServicesAdmin.updateVehicleInDatabase(vehicle);
+        containerServicesAdmin.updateContainerInDatabase(selectedContainer);
+        uiUtils.printSuccessMessage("Container unloaded successfully!");
+    }
+
+    public void addExistingContainer() {
+        uiUtils.clearScreen();
+
+        uiUtils.printFunctionName("ADD EXISTING CONTAINER WIZARD", 100);
+        System.out.println();
+
+        List<Container> containerList = fetchContainersFromDatabase();
+
+        uiUtils.printTopBorderWithTableName("UNOCCUPIED CONTAINERS", 15, 20, 15);
+        System.out.printf("| %-15s | %-20s | %-15s |\n", "Container ID", "Container Type", "Weight");
+        uiUtils.printHorizontalLine(15, 20, 15);
+        for (Container container : containerList) {
+            if (container.getCurrentPort() == null) {
+                System.out.printf("| %-15s | %-20s | %-15.2f |\n", container.getContainerId(), container.getContainerType(), container.getWeight());
+            }
+        }
+        uiUtils.printHorizontalLine(15, 20, 15);
+
+        String containerId = inputValidation.idValidation("C", "Enter container ID to add: ");
+        System.out.println();
+
+        Container containerToAdd = null;
+        int indexToUpdate = -1;  // new variable to keep track of the index in the list
+        for (int i = 0; i < containerList.size(); i++) {
+            if (containerList.get(i).getContainerId().equals(containerId) && containerList.get(i).getCurrentPort() == null) {
+                containerToAdd = containerList.get(i);
+                indexToUpdate = i;
+                break;
             }
         }
 
-        // Get input for container id
-        System.out.println("Enter the container ID you want to unload:");
-        String containerId = scanner.nextLine();
-        Container selectedContainer = findContainerById(containerId);
+        if (containerToAdd != null) {
+            managedPort.addContainer(containerToAdd);
 
-        assert selectedContainer != null;
-        Vehicle vehicle = selectedContainer.getCurrentVehicle();
-        vehicle.unloadContainer(selectedContainer);
-        System.out.println("Container unloaded successfully!");
+            // Update container's currentPort attribute to reflect the new location
+            containerToAdd.setCurrentPort(managedPort); // Assuming your Port object has a getPortName() method
+            containerList.set(indexToUpdate, containerToAdd); // Replace the old container with the updated one in the list
+
+            // Write the updated list back to the database
+            dbHandler.writeObjects(CONTAINER_FILE_PATH, containerList.toArray(new Container[0]));
+
+            uiUtils.printSuccessMessage("Container with ID " + containerId + " added successfully.");
+        } else {
+            uiUtils.printFailedMessage("No container found with the given ID.");
+        }
     }
 
+
     public void createNewContainer() {
-        System.out.println("CONTAINER CREATE WIZARD");
-        System.out.print("Enter container ID: ");
-        String containerId = scanner.nextLine();
-        System.out.print("Enter container weight: ");
-        double weight = scanner.nextDouble();
+        uiUtils.clearScreen();
+
+        uiUtils.printFunctionName("CREATE NEW CONTAINER WIZARD", 100);
+        System.out.println();
+
+        String containerId = inputValidation.idValidation("C", "Enter container ID: ");
+        System.out.println();
+
+        double weight = inputValidation.getDouble("Enter container weight: ");
+        System.out.println();
+
         System.out.println("Select container type:");
         System.out.println("1. Dry storage");
         System.out.println("2. Open Side");
         System.out.println("3. Open Top");
         System.out.println("4. Liquid");
         System.out.println("5. Refrigerated");
-        System.out.print("Enter your choice: ");
-        int choice = scanner.nextInt();
-        scanner.nextLine();  // To consume any leftover newline
+        int choice = inputValidation.getInt("Enter your choice: ");
+
         Container newContainer = null;
         switch (choice) {
             case 1 -> newContainer = new DryStorage(containerId, weight, managedPort);
@@ -142,49 +251,48 @@ public class ContainerServicesManager extends ManagerBaseServices implements Con
             case 4 -> newContainer = new Liquid(containerId, weight, managedPort);
             case 5 -> newContainer = new Refrigerated(containerId, weight, managedPort);
             default -> {
-                System.out.println("Invalid choice.");
+                uiUtils.printFailedMessage("Invalid choice.");
                 return;
             }
         }
 
-        List<Container> containerList;
-        try {
-            Container[] containersArray = (Container[]) dbHandler.readObjects(CONTAINER_FILE_PATH);
-            containerList = new ArrayList<>(Arrays.asList(containersArray));
-        } catch (Exception e) {
-            containerList = new ArrayList<>();
-        }
-
+        List<Container> containerList = fetchContainersFromDatabase();
         containerList.add(newContainer);
         managedPort.addContainer(newContainer);
 
         dbHandler.writeObjects(CONTAINER_FILE_PATH, containerList.toArray(new Container[0]));
+        portServicesAdmin.updatePortInDatabase(managedPort);
     }
 
     @Override
     public void findContainer() {
-        System.out.println("DISPLAY CONTAINER INFO");
-        System.out.print("Enter container ID: ");
-        String containerIdToDisplay = scanner.nextLine();
+        uiUtils.clearScreen();
 
-        List<Container> containerList = managedPort.getCurrentContainers();
+        uiUtils.printFunctionName("CONTAINER SEARCH WIZARD", 100);
+        System.out.println();
+
+        String containerIdToDisplay = inputValidation.idValidation("C", "Enter container ID to search:");
+        System.out.println();
+
+        List<Container> containerList = fetchContainersFromDatabase();
 
         Container containerToDisplay = null;
         for (Container container : containerList) {
-            if (container.getContainerId().equals(containerIdToDisplay)) {
-                containerToDisplay = container;
-                break;
+            if (container.getCurrentPort().getPortId().equals(managedPort.getPortId())) {
+                if (container.getContainerId().equals(containerIdToDisplay)) {
+                    containerToDisplay = container;
+                }
             }
         }
 
         if (containerToDisplay != null) {
-            System.out.println("--------------------------------------------------------------------------------------");
+            uiUtils.printTopBorderWithTableName("CONTAINER INFORMATION", 15, 20, 15);
             System.out.printf("| %-15s | %-20s | %-15s |\n", "Container ID", "Container Type", "Weight");
-            System.out.println("--------------------------------------------------------------------------------------");
+            uiUtils.printHorizontalLine(15, 20, 15);
             System.out.printf("| %-15s | %-20s | %-15.2f |\n", containerToDisplay.getContainerId(), containerToDisplay.getContainerType(), containerToDisplay.getWeight());
-            System.out.println("--------------------------------------------------------------------------------------");
+            uiUtils.printHorizontalLine(15, 20, 15);
         } else {
-            System.out.println("No container found with the given ID.");
+            uiUtils.printFailedMessage("No container found with the given ID.");
         }
     }
 
@@ -211,9 +319,13 @@ public class ContainerServicesManager extends ManagerBaseServices implements Con
     }
 
     public void updateContainer() {
-        System.out.println("CONTAINER UPDATE WIZARD");
-        System.out.print("Enter container ID to update: ");
-        String containerIdToUpdate = scanner.nextLine();
+        uiUtils.clearScreen();
+
+        uiUtils.printFunctionName("CONTAINER UPDATE WIZARD", 100);
+        System.out.println();
+
+        String containerIdToUpdate = inputValidation.idValidation("C", "Enter container ID to update: ");
+        System.out.println();
 
         // Check if the container is in the managedPort
         Container managedPortContainer = null;
@@ -229,14 +341,7 @@ public class ContainerServicesManager extends ManagerBaseServices implements Con
             return;
         }
 
-        List<Container> containerList;
-        try {
-            Container[] containersArray = (Container[]) dbHandler.readObjects(CONTAINER_FILE_PATH);
-            containerList = new ArrayList<>(Arrays.asList(containersArray));
-        } catch (Exception e) {
-            System.out.println("Error reading containers or no containers exist.");
-            return;
-        }
+        List<Container> containerList = fetchContainersFromDatabase();
 
         Container containerToUpdate = null;
         int indexToUpdate = -1;  // new variable to keep track of the index in the list
@@ -281,16 +386,20 @@ public class ContainerServicesManager extends ManagerBaseServices implements Con
             }
 
             dbHandler.writeObjects(CONTAINER_FILE_PATH, containerList.toArray(new Container[0]));
-            System.out.println("Container with ID " + containerIdToUpdate + " updated successfully.");
+            uiUtils.printSuccessMessage("Container with ID " + containerIdToUpdate + " updated successfully.");
         } else {
-            System.out.println("No container found with the given ID.");
+            uiUtils.printFailedMessage("No container found with the given ID.");
         }
     }
 
     public void deleteContainer() {
-        System.out.println("CONTAINER DELETE WIZARD");
-        System.out.print("Enter container ID to delete: ");
-        String containerIdToDelete = scanner.nextLine();
+        uiUtils.clearScreen();
+
+        uiUtils.printFunctionName("CONTAINER DELETE WIZARD", 100);
+        System.out.println();
+
+        String containerIdToDelete = inputValidation.idValidation("C", "Enter container ID to delete: ");
+        System.out.println();
 
         // Check if the container is in the managedPort
         boolean existsInManagedPort = false;
@@ -306,14 +415,7 @@ public class ContainerServicesManager extends ManagerBaseServices implements Con
             return;
         }
 
-        List<Container> containerList;
-        try {
-            Container[] containersArray = (Container[]) dbHandler.readObjects(CONTAINER_FILE_PATH);
-            containerList = new ArrayList<>(Arrays.asList(containersArray));
-        } catch (Exception e) {
-            System.out.println("Error reading containers or no containers exist.");
-            return;
-        }
+        List<Container> containerList = fetchContainersFromDatabase();
 
         boolean isDeleted = false;
         Iterator<Container> iterator = containerList.iterator();

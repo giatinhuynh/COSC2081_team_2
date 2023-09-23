@@ -233,4 +233,26 @@ public class PortServicesAdmin extends AdminBaseServices implements PortCRUD {
     public Port getPortById(String portId) {
         return findPortById(portId).orElse(null);
     }
+
+    public void updatePortInDatabase(Port portToUpdate) {
+        // Load all ports from the database
+        List<Port> portList = fetchPortsFromDatabase();
+
+        // Find the index of the port to update
+        int indexToUpdate = -1;
+        for (int i = 0; i < portList.size(); i++) {
+            if (portList.get(i).getPortId().equals(portToUpdate.getPortId())) {
+                indexToUpdate = i;
+                break;
+            }
+        }
+
+        // If port was found in the list, replace it with the updated one and save back to the database
+        if (indexToUpdate != -1) {
+            portList.set(indexToUpdate, portToUpdate);
+
+            // Assuming you have a method to save a list of ports to the database, something like:
+            writePortsToDatabase(portList);
+        }
+    }
 }

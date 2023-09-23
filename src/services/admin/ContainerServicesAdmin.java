@@ -249,4 +249,28 @@ public class ContainerServicesAdmin extends AdminBaseServices implements Contain
         }
         return null;
     }
+
+    public void updateContainerInDatabase(Container containerToUpdate) {
+        // Load all containers from the database
+        List<Container> containerList = fetchContainersFromDatabase();
+
+        // Find the index of the container to update
+        int indexToUpdate = -1;
+        for (int i = 0; i < containerList.size(); i++) {
+            if (containerList.get(i).getContainerId().equals(containerToUpdate.getContainerId())) {
+                indexToUpdate = i;
+                break;
+            }
+        }
+
+        // If container was found in the list, replace it with the updated one and save back to the database
+        if (indexToUpdate != -1) {
+            containerList.set(indexToUpdate, containerToUpdate);
+
+            // Assuming you have a method to save a list of containers to the database, something like:
+            writeContainersToDatabase(containerList);
+        }
+    }
+
+
 }

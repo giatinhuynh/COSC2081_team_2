@@ -1,11 +1,14 @@
 package services.manager;
 
 import database.DatabaseHandler;
+import exceptions.InputValidation;
+import exceptions.TypeCheck;
 import interfaces.manager.ManagerPortInterface;
 import models.port.Port;
 import models.user.PortManager;
 import utils.Constants;
 import utils.CurrentUser;
+import utils.UiUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,6 +21,9 @@ public class PortServicesManager extends ManagerBaseServices implements ManagerP
     private final Scanner scanner = new Scanner(System.in);
     private final String PORT_FILE_PATH = Constants.PORT_FILE_PATH;
     private final DatabaseHandler dbHandler = new DatabaseHandler();
+    private final UiUtils uiUtils = new UiUtils();
+    private final InputValidation inputValidation = new InputValidation();
+    private final TypeCheck typeCheck = new TypeCheck();
 
     // Modularized method to fetch ports from the database
     private List<Port> fetchPortsFromDatabase() {
@@ -25,7 +31,7 @@ public class PortServicesManager extends ManagerBaseServices implements ManagerP
             Port[] portsArray = (Port[]) dbHandler.readObjects(PORT_FILE_PATH);
             return new ArrayList<>(Arrays.asList(portsArray));
         } catch (Exception e) {  // Catching a generic exception as a placeholder.
-            System.out.println("Error reading ports or no ports exist.");
+            uiUtils.printFailedMessage("Error reading ports or no ports exist.");
             return new ArrayList<>();
         }
     }
@@ -39,6 +45,11 @@ public class PortServicesManager extends ManagerBaseServices implements ManagerP
     }
 
     public void viewPortInfo() {
+        uiUtils.clearScreen();
+
+        uiUtils.printFunctionName("YOUR PORT INFORMATION", 100);
+        System.out.println();
+        System.out.println("Port ID: " + managedPort.getPortId());
         System.out.println("Port Name: " + managedPort.getName());
         System.out.println("Port Latitude: " + managedPort.getLatitude());
         System.out.println("Port Longitude: " + managedPort.getLongitude());
@@ -47,9 +58,12 @@ public class PortServicesManager extends ManagerBaseServices implements ManagerP
     }
 
     public void updatePortInfo() {
-        System.out.println("PORT UPDATE WIZARD");
-        System.out.print("Enter port ID to update: ");
-        String portIdToUpdate = scanner.nextLine();
+        uiUtils.clearScreen();
+
+        uiUtils.printFunctionName("UPDATE PORT INFORMATION WIZARD", 100);
+        System.out.println();
+
+        String portIdToUpdate = managedPort.getPortId();
 
         List<Port> portsList = fetchPortsFromDatabase();
 
@@ -65,41 +79,51 @@ public class PortServicesManager extends ManagerBaseServices implements ManagerP
             System.out.print("Enter new port name (leave blank to keep unchanged): ");
             String name = scanner.nextLine();
             if (!name.isEmpty()) {
-                portToUpdate.setName(name);
+                if (typeCheck.isString(name)) {
+                    portToUpdate.setName(name);
+                }
             }
 
             System.out.print("Enter new port latitude (leave blank to keep unchanged): ");
             String latitudeStr = scanner.nextLine();
             if (!latitudeStr.isEmpty()) {
-                double latitude = Double.parseDouble(latitudeStr);
-                portToUpdate.setLatitude(latitude);
+                if (typeCheck.isDouble(latitudeStr)) {
+                    double latitude = Double.parseDouble(latitudeStr);
+                    portToUpdate.setLatitude(latitude);
+                }
             }
 
             System.out.print("Enter new port longitude (leave blank to keep unchanged): ");
             String longitudeStr = scanner.nextLine();
             if (!longitudeStr.isEmpty()) {
-                double longitude = Double.parseDouble(longitudeStr);
-                portToUpdate.setLongitude(longitude);
+                if (typeCheck.isDouble(longitudeStr)) {
+                    double longitude = Double.parseDouble(longitudeStr);
+                    portToUpdate.setLongitude(longitude);
+                }
             }
 
             System.out.print("Enter new port storing capacity (leave blank to keep unchanged): ");
             String capacityStr = scanner.nextLine();
             if (!capacityStr.isEmpty()) {
-                double storingCapacity = Double.parseDouble(capacityStr);
-                portToUpdate.setStoringCapacity(storingCapacity);
+                if (typeCheck.isDouble(capacityStr)) {
+                    double storingCapacity = Double.parseDouble(capacityStr);
+                    portToUpdate.setStoringCapacity(storingCapacity);
+                }
             }
 
             System.out.print("Enter new port landing ability (True/False, leave blank to keep unchanged): ");
             String landingAbilityStr = scanner.nextLine();
             if (!landingAbilityStr.isEmpty()) {
-                boolean landingAbility = Boolean.parseBoolean(landingAbilityStr);
-                portToUpdate.setLandingAbility(landingAbility);
+                if (typeCheck.isBoolean(landingAbilityStr)) {
+                    boolean landingAbility = Boolean.parseBoolean(landingAbilityStr);
+                    portToUpdate.setLandingAbility(landingAbility);
+                }
             }
 
             dbHandler.writeObjects(PORT_FILE_PATH, portsList.toArray(new Port[0]));
-            System.out.println("Port with ID " + portIdToUpdate + " updated successfully.");
+            uiUtils.printSuccessMessage("Port with ID " + portIdToUpdate + " updated successfully.");
         } else {
-            System.out.println("No port found with the given ID.");
+            uiUtils.printFailedMessage("No port found with the given ID.");
         }
     }
 }
