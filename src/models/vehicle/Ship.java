@@ -12,6 +12,10 @@ public class Ship extends Vehicle {
         super(vehicleId, name, currentFuel, carryingCapacity, fuelCapacity);
     }
 
+    public Ship(String vehicleId, String name, double currentFuel, double carryingCapacity, double fuelCapacity, Port currentPort) {
+        super(vehicleId, name, currentFuel, carryingCapacity, fuelCapacity, currentPort);
+    }
+
     @Override
     public boolean canCarry(Container container) {
         return true;
