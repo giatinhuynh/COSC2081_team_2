@@ -10,6 +10,7 @@ import views.flow.PortManagerFlow;
 import utils.UiUtils;
 
 import java.io.Console;
+import java.text.ParseException;
 import java.util.Scanner;
 
 /**
@@ -50,7 +51,7 @@ public class LoginView extends BaseView {
     /**
      * Displays the login view, captures user input, and directs the user to the appropriate view based on their role.
      */
-    public void displayLoginView() {
+    public void displayLoginView() throws ParseException {
         printSeparator(30);
         printCentered("LOGIN", 30);
         printSeparator(30);

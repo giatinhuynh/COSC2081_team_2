@@ -268,4 +268,35 @@ public class TripServicesAdmin extends AdminBaseServices implements TripCRUD {
         }
         return true;
     }
+
+    public void historyClear() {
+        List<Trip> tripsList = fetchTripsFromDatabase();
+        List<Trip> filteredTrips = new ArrayList<>();
+
+        Date currentDate = Constants.SYSTEM_DATE; // Gets the current date
+
+        for (Trip trip : tripsList) {
+            if ((currentDate.getTime() - trip.getDepartureDate().getTime()) <= (7 * 24 * 60 * 60 * 1000)) { // Checks if the trip's date is within the last 7 days.
+                filteredTrips.add(trip);
+            }
+        }
+
+        dbHandler.writeObjects(TRIP_FILE_PATH, filteredTrips.toArray(new Trip[0])); // Writes the filtered trips back to the database.
+    }
+
+    public void updateTripStatusBasedOnSystemDate() {
+        List<Trip> tripsList = fetchTripsFromDatabase();
+
+        Date systemDate;
+        systemDate = Constants.SYSTEM_DATE;
+
+        for (Trip trip : tripsList) {
+            if (trip.getDepartureDate().equals(systemDate)) {
+                trip.setStatus(String.valueOf(Trip.Status.IN_TRANSIT)); // Assuming the Trip class has an enum called Status with a value ONGOING.
+            }
+        }
+
+        dbHandler.writeObjects(TRIP_FILE_PATH, tripsList.toArray(new Trip[0]));
+    }
+
 }

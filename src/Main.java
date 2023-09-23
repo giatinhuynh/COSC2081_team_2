@@ -15,6 +15,9 @@
 
 import views.display.StaticDisplay;
 import views.display.LoginView;
+import services.admin.TripServicesAdmin;
+
+import java.text.ParseException;
 
 /**
  * This is the main class responsible for running the application.
@@ -28,14 +31,21 @@ public class Main {
     // Login view instance to handle user login.
     private static final LoginView loginView = new LoginView();
 
+    static TripServicesAdmin tripServicesAdmin = new TripServicesAdmin();
+
+
+
     /**
      * The main method which serves as the entry point for the application.
      *
      * @param args Command line arguments (not used in this application).
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws ParseException {
         // Display the assessment information.
         staticDisplay.displayAssessmentInfo();
+
+        tripServicesAdmin.historyClear();
+        tripServicesAdmin.updateTripStatusBasedOnSystemDate();
 
         // Display the login view to the user.
         loginView.displayLoginView();
