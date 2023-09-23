@@ -51,7 +51,6 @@ public class LoginView extends BaseView {
      * Displays the login view, captures user input, and directs the user to the appropriate view based on their role.
      */
     public void displayLoginView() {
-        uiUtils.clearScreen();
         printSeparator(30);
         printCentered("LOGIN", 30);
         printSeparator(30);
