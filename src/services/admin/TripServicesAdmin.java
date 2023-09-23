@@ -178,7 +178,7 @@ public class TripServicesAdmin extends AdminBaseServices implements TripCRUD {
         uiUtils.printHorizontalLine(10, 20, 20, 20, 20, 20, 20);
         for (Trip trip : tripsList) {
             System.out.printf("| %-10s | %-20s | %-20s | %-20s | %-20s | %-20s | %-20s |\n",
-                    trip.getTripId(), trip.getVehicle().toString(), trip.getDeparturePort().getName(),
+                    trip.getTripId(), trip.getVehicle().getName(), trip.getDeparturePort().getName(),
                     trip.getArrivalPort().getName(), sdf.format(trip.getDepartureDate()),
                     trip.getArrivalDate() != null ? sdf.format(trip.getArrivalDate()) : "N/A", trip.getStatus());
         }

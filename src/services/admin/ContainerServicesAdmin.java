@@ -75,7 +75,7 @@ public class ContainerServicesAdmin extends AdminBaseServices implements Contain
         uiUtils.printFunctionName("CONTAINER CREATION WIZARD", 100);
         System.out.println();
 
-        String containerId = inputValidation.idValidation("C-", "Enter container ID to create: ");
+        String containerId = inputValidation.idValidation("C", "Enter container ID to create: ");
         if (!uniqueContainerIdCheck(containerId)) {
             return;  // Exit the creation process if the ID is not unique
         }
@@ -136,7 +136,7 @@ public class ContainerServicesAdmin extends AdminBaseServices implements Contain
         uiUtils.printFunctionName("CONTAINER SEARCH WIZARD", 100);
         System.out.println();
 
-        String containerIdToDisplay = inputValidation.idValidation("C-", "Enter container ID to search: ");
+        String containerIdToDisplay = inputValidation.idValidation("C", "Enter container ID to search: ");
         System.out.println();
 
         Optional<Container> optionalContainer = findContainerById(containerIdToDisplay);
@@ -187,7 +187,7 @@ public class ContainerServicesAdmin extends AdminBaseServices implements Contain
         uiUtils.printFunctionName("CONTAINER UPDATE WIZARD", 100);
         System.out.println();
 
-        String containerIdToUpdate = inputValidation.idValidation("C-", "Enter container ID to update: ");
+        String containerIdToUpdate = inputValidation.idValidation("C", "Enter container ID to update: ");
         System.out.println();
 
         List<Container> containerList = fetchContainersFromDatabase();
@@ -259,7 +259,7 @@ public class ContainerServicesAdmin extends AdminBaseServices implements Contain
         uiUtils.printFunctionName("CONTAINER DELETE WIZARD", 100);
         System.out.println();
 
-        String containerIdToDelete = inputValidation.idValidation("C-", "Enter container ID to delete: ");
+        String containerIdToDelete = inputValidation.idValidation("C", "Enter container ID to delete: ");
         System.out.println();
 
         List<Container> containerList = fetchContainersFromDatabase();

@@ -6,21 +6,21 @@ import models.vehicle.Ship;
 import models.vehicle.Truck;
 import services.admin.PortServicesAdmin;
 import services.admin.TripServicesAdmin;
+import utils.UiUtils;
 
 import java.util.List;
 
 public class TripStatistics implements TripStatInterface {
 
     private final TripServicesAdmin tripController = new TripServicesAdmin();
+    private final UiUtils uiUtils = new UiUtils();
 
     public void displayTotalTrips() {
         int total = tripController.fetchTripsFromDatabase().size();
 
-        System.out.println("=================================");
-        System.out.println("   TOTAL NUMBER OF TRIPS    ");
-        System.out.println("=================================");
-        System.out.println("             " + total + "             ");
-        System.out.println("=================================");
+        uiUtils.printTopBorderWithTableName("Total number of trips in the system", 53);
+        System.out.printf("| %-53s |\n", total + " trips");
+        uiUtils.printHorizontalLine(53);
     }
 
     public void tripStatus() {
@@ -39,13 +39,13 @@ public class TripStatistics implements TripStatInterface {
             }
         }
 
-        System.out.println("-------------------------------");
-        System.out.printf("| %-15s | %-7s |\n", "Trip Status", "Count");
-        System.out.println("-------------------------------");
-        System.out.printf("| %-15s | %-7d |\n", "LOADING", loadingCount);
-        System.out.printf("| %-15s | %-7d |\n", "IN_TRANSIT", inTransitCount);
-        System.out.printf("| %-15s | %-7d |\n", "COMPLETED", completedCount);
-        System.out.println("-------------------------------");
+        uiUtils.printTopBorderWithTableName("Trip status", 30, 20);
+        System.out.printf("| %-30s | %-20s |\n", "Trip Status", "Count");
+        uiUtils.printHorizontalLine(30, 20);
+        System.out.printf("| %-30s | %-20d |\n", "LOADING", loadingCount);
+        System.out.printf("| %-30s | %-20d |\n", "IN TRANSIT", inTransitCount);
+        System.out.printf("| %-30s | %-20d |\n", "COMPLETED", completedCount);
+        uiUtils.printHorizontalLine(30, 20);
     }
 
     public void tripByVehicle() {
@@ -61,12 +61,12 @@ public class TripStatistics implements TripStatInterface {
             }
         }
 
-        System.out.println("-------------------------------");
-        System.out.printf("| %-15s | %-7s |\n", "Vehicle Type", "Trips");
-        System.out.println("-------------------------------");
-        System.out.printf("| %-15s | %-7d |\n", "Truck", truckCount);
-        System.out.printf("| %-15s | %-7d |\n", "Ship", shipCount);
-        System.out.println("-------------------------------");
+        uiUtils.printTopBorderWithTableName("Trip by vehicle", 30, 20);
+        System.out.printf("| %-30s | %-20s |\n", "Vehicle Type", "Trips");
+        uiUtils.printHorizontalLine(30, 20);
+        System.out.printf("| %-30s | %-20d |\n", "Truck", truckCount);
+        System.out.printf("| %-30s | %-20d |\n", "Ship", shipCount);
+        uiUtils.printHorizontalLine(30, 20);
     }
 
     public void averageTripDuration() {
@@ -81,10 +81,15 @@ public class TripStatistics implements TripStatInterface {
             }
         }
 
-        System.out.println("=================================");
-        System.out.println("   AVERAGE TRIP DURATION    ");
-        System.out.println("=================================");
-        System.out.println("             " + (total / count) + "             ");
-        System.out.println("=================================");
+        uiUtils.printTopBorderWithTableName("Average trip duration", 53);
+        uiUtils.printHorizontalLine(53);
+
+        if (count == 0) {
+            System.out.printf("| %-53s |\n", "No completed trips in the system.");
+        } else {
+            System.out.printf("| %-53s |\n", (total / count) + " hours");
+        }
+
+        uiUtils.printHorizontalLine(53);
     }
 }

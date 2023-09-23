@@ -3,6 +3,7 @@ package services.statistics;
 import interfaces.statistics.ContainerStatInterface;
 import models.container.Container;
 import services.admin.ContainerServicesAdmin;
+import utils.UiUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -11,15 +12,14 @@ import java.util.stream.Collectors;
 public class ContainerStatistics extends Statistics implements ContainerStatInterface {
 
     private final ContainerServicesAdmin containerController = new ContainerServicesAdmin();
+    private final UiUtils uiUtils = new UiUtils();
 
     public void displayTotalNumberOfContainers() {
         int total = containerController.fetchContainersFromDatabase().size();
 
-        System.out.println("=================================");
-        System.out.println("   TOTAL NUMBER OF CONTAINERS    ");
-        System.out.println("=================================");
-        System.out.println("             " + total + "             ");
-        System.out.println("=================================");
+        uiUtils.printTopBorderWithTableName("Total number of containers in the system", 53);
+        System.out.printf("| %-53s |\n", total + " containers");
+        uiUtils.printHorizontalLine(53);
     }
 
     public void containerStatus() {
@@ -27,18 +27,19 @@ public class ContainerStatistics extends Statistics implements ContainerStatInte
         int total = allContainers.size();
 
         String[] statuses = {"Loaded", "Awaiting loading", "In transit", "Unoccupied"};
-        System.out.println("-------------------------------");
-        System.out.printf("| %-20s | %-7s |\n", "Status", "Count");
-        System.out.println("-------------------------------");
+
+        uiUtils.printTopBorderWithTableName("Container status", 30, 20);
+        System.out.printf("| %-30s | %-20s |\n", "Status", "Count");
+        uiUtils.printHorizontalLine(30, 20);
         for (String status : statuses) {
             long count = allContainers.stream()
                     .filter(container -> container.getContainerStatus().equals(status))
                     .count();
-            System.out.printf("| %-20s | %-7d |\n", status, count);
+            System.out.printf("| %-30s | %-20d |\n", status, count);
         }
-        System.out.println("-------------------------------");
-        System.out.printf("| %-20s | %-7d |\n", "Total", total);
-        System.out.println("-------------------------------");
+        uiUtils.printHorizontalLine(30, 20);
+        System.out.printf("| %-30s | %-20d |\n", "Total", total);
+        uiUtils.printHorizontalLine(30, 20);
     }
 
     public void containerType() {
@@ -46,18 +47,18 @@ public class ContainerStatistics extends Statistics implements ContainerStatInte
         int total = allContainers.size();
 
         String[] types = {"Refrigerated", "Liquid", "Dry Storage", "Open Top", "Open Side"};
-        System.out.println("-------------------------------");
-        System.out.printf("| %-20s | %-7s |\n", "Type", "Count");
-        System.out.println("-------------------------------");
+        uiUtils.printTopBorderWithTableName("Container type", 30, 20);
+        System.out.printf("| %-30s | %-20s |\n", "Type", "Count");
+        uiUtils.printHorizontalLine(30, 20);
         for (String type : types) {
             long count = allContainers.stream()
                     .filter(container -> container.getContainerType().equals(type))
                     .count();
-            System.out.printf("| %-20s | %-7d |\n", type, count);
+            System.out.printf("| %-30s | %-20d |\n", type, count);
         }
-        System.out.println("-------------------------------");
-        System.out.printf("| %-20s | %-7d |\n", "Total", total);
-        System.out.println("-------------------------------");
+        uiUtils.printHorizontalLine(30, 20);
+        System.out.printf("| %-30s | %-20d |\n", "Total", total);
+        uiUtils.printHorizontalLine(30, 20);
     }
 
     public void containerPerPort() {
@@ -65,16 +66,21 @@ public class ContainerStatistics extends Statistics implements ContainerStatInte
         int total = allContainers.size();
 
         Map<String, Long> containerCountPerPort = allContainers.stream()
-                .collect(Collectors.groupingBy(container -> container.getCurrentPort().getPortId(), Collectors.counting()));
+                .collect(Collectors.groupingBy(container -> {
+                    if (container.getCurrentPort() == null) {
+                        return "No Port";  // Grouping containers that do not belong to any port
+                    }
+                    return container.getCurrentPort().getPortId();
+                }, Collectors.counting()));
 
-        System.out.println("-----------------------");
-        System.out.printf("| %-10s | %-7s |\n", "Port ID", "Count");
-        System.out.println("-----------------------");
+        uiUtils.printTopBorderWithTableName("Containers per port", 30, 20);
+        System.out.printf("| %-30s | %-20s |\n", "Port ID", "Count");
+        uiUtils.printHorizontalLine(30, 20);
         containerCountPerPort.forEach((portId, count) -> {
-            System.out.printf("| %-10s | %-7d |\n", portId, count);
+            System.out.printf("| %-30s | %-20d |\n", portId, count);
         });
-        System.out.println("-----------------------");
-        System.out.printf("| %-10s | %-7d |\n", "Total", total);
-        System.out.println("-----------------------");
+        uiUtils.printHorizontalLine(30, 20);
+        System.out.printf("| %-30s | %-20d |\n", "Total", total);
+        uiUtils.printHorizontalLine(30, 20);
     }
 }

@@ -291,30 +291,47 @@ public class AdminFlow extends BaseView {
         int choice = promptForInput("Enter your choice: ");
         switch (choice) {
             case 1 -> {
+                uiUtils.clearScreen();
                 portStatistics.displayTotalNumberOfPorts();
+                System.out.println();
                 portStatistics.portUsedCapacity();
+                System.out.println();
                 portStatistics.portTripCount();
                 backToMenu();
                 displayAdminStatisticsMenu();
             }
             case 2 -> {
+                uiUtils.clearScreen();
                 containerStatistics.displayTotalNumberOfContainers();
+                System.out.println();
                 containerStatistics.containerStatus();
+                System.out.println();
                 containerStatistics.containerType();
+                System.out.println();
                 containerStatistics.containerPerPort();
                 backToMenu();
                 displayAdminStatisticsMenu();
             }
             case 3 -> {
+                uiUtils.clearScreen();
                 vehicleStatistics.displayTotalNumberOfVehicles();
+                System.out.println();
                 vehicleStatistics.vehiclePerPort();
+                System.out.println();
                 vehicleStatistics.vehicleStatus();
+                System.out.println();
                 vehicleStatistics.vehicleType();
+                backToMenu();
+                displayAdminStatisticsMenu();
             }
             case 4 -> {
+                uiUtils.clearScreen();
                 tripStatistics.displayTotalTrips();
+                System.out.println();
                 tripStatistics.tripStatus();
+                System.out.println();
                 tripStatistics.tripByVehicle();
+                System.out.println();
                 tripStatistics.averageTripDuration();
                 backToMenu();
                 displayAdminStatisticsMenu();
