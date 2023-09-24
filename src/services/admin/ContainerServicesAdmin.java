@@ -214,12 +214,8 @@ public class ContainerServicesAdmin extends AdminBaseServices implements Contain
             System.out.print("Enter new container weight (leave blank to keep unchanged): ");
             String newWeight = scanner.nextLine();
             if (!newWeight.isEmpty()) {
-                if (typeCheck.isDouble(newWeight)) {
-                    containerToUpdate.setWeight(Double.parseDouble(newWeight));
-                    return;
-                }
+                containerToUpdate.setWeight(Double.parseDouble(newWeight));
             }
-
 
             System.out.println("Select new container type (or leave blank to keep unchanged):");
             System.out.println("1. Dry storage");
@@ -248,8 +244,6 @@ public class ContainerServicesAdmin extends AdminBaseServices implements Contain
                     }
                 }
                 containerList.set(indexToUpdate, containerToUpdate);  // Replace the old container with the updated one
-            } else if (!newWeight.isEmpty()) {
-                containerToUpdate.setWeight(Double.parseDouble(newWeight));
             }
 
             dbHandler.writeObjects(CONTAINER_FILE_PATH, containerList.toArray(new Container[0]));
