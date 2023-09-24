@@ -302,7 +302,7 @@ public class VehicleServicesManager extends ManagerBaseServices implements Vehic
 
         String vehicleId;
         do {
-            vehicleId = inputValidation.idValidation("C", "Enter vehicle ID to create: ");
+            vehicleId = inputValidation.idValidation("V", "Enter vehicle ID to create: ");
         } while (!vehicleController.uniqueVehicleIdCheck(vehicleId));  // Keep asking until a unique ID is provided
         System.out.println();
 
