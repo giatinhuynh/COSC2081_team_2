@@ -72,6 +72,11 @@ public class ContainerServicesManager extends ManagerBaseServices implements Con
         uiUtils.printHorizontalLine(15, 20 ,15);
         System.out.println();
 
+        if (managedPort.getCurrentContainers().size() == 0) {
+            uiUtils.printFailedMessage("Cannot load because there is no container");
+            return;
+        }
+
         // Get input for container id
         String containerId = inputValidation.idValidation("C", "Enter container ID you want to load: ");
         System.out.println();

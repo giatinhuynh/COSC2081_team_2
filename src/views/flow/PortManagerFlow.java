@@ -18,7 +18,7 @@ public class PortManagerFlow extends BaseView {
     public void PortManagerMenu() throws ParseException {
         uiUtils.clearScreen();
         System.out.println("Welcome, Port Manager!");
-        displayHeader("PORT MANAGER MENU");
+        displayMenuHeader("PORT MANAGER MENU");
         displayMessage("1. Manage Containers");
         displayMessage("2. Manage Vehicles");
         displayMessage("3. View Port Details");
