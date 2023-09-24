@@ -144,7 +144,6 @@ public class VehicleServicesManager extends ManagerBaseServices implements Vehic
 
         if (selectedVehicle != null) {
             // Ask for destination port
-            System.out.println("Enter the destination port ID:");
             String destinationPortId = inputValidation.idValidation("P", "Enter the destination port ID:");
             Port selectedDestinationPort = portController.getPortById(destinationPortId);
 
