@@ -113,6 +113,7 @@ public class AdminFlow extends BaseView {
         displayOption("4. Search Container");
         displayOption("5. View All Containers");
         displayOption("0. Back");
+        uiUtils.displayHorizontalLine(53);
 
         int choice = inputValidation.getChoice("Enter your choice (0-5): ", 0, 5);
         switch (choice) {
@@ -256,6 +257,7 @@ public class AdminFlow extends BaseView {
         displayOption("4. Search Trip");
         displayOption("5. View All Trips");
         displayOption("0. Back");
+        uiUtils.displayHorizontalLine(53);
 
         int choice = inputValidation.getChoice("Enter your choice (0-5): ", 0, 5);
         switch (choice) {
