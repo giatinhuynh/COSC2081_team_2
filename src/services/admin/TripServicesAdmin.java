@@ -73,14 +73,14 @@ public class TripServicesAdmin extends AdminBaseServices implements TripCRUD {
         PortServicesAdmin portController = new PortServicesAdmin();
 
         portController.displayAllPorts(); // Display all ports
-        String departurePortId = inputValidation.idValidation("P-", "Enter departure port ID: ");
+        String departurePortId = inputValidation.idValidation("P", "Enter departure port ID: ");
         Port departurePort = portController.getPortById(departurePortId);
         if (departurePort == null) {
             uiUtils.printFailedMessage("Invalid departure port ID. Aborting trip creation.");
             return;
         }
 
-        String arrivalPortId = inputValidation.idValidation("P-", "Enter arrival port ID: ");
+        String arrivalPortId = inputValidation.idValidation("P", "Enter arrival port ID: ");
         Port arrivalPort = portController.getPortById(arrivalPortId);
         if (arrivalPort == null) {
             uiUtils.printFailedMessage("Invalid arrival port ID. Aborting trip creation.");
@@ -111,33 +111,12 @@ public class TripServicesAdmin extends AdminBaseServices implements TripCRUD {
         uiUtils.printSuccessMessage("Trip created successfully!");
     }
 
-
-    private String generateNextTripId() {
-        List<Trip> tripsList = fetchTripsFromDatabase();
-
-        if (tripsList.isEmpty()) {
-            return "T-000001"; // Starting ID
-        } else {
-            String lastTripId = tripsList.get(tripsList.size() - 1).getTripId();
-            int nextId = Integer.parseInt(lastTripId.substring(2)) + 1;
-            return String.format("T%06d", nextId);
-        }
-    }
-
-    public void createNewTrip(Vehicle vehicle, Port departurePort, Port arrivalPort, Date arrivalDate, Date departureDate, Trip.Status status) {
-        String tripId = generateNextTripId();
-        Trip newTrip = new Trip(tripId, vehicle, departurePort, arrivalPort, departureDate, arrivalDate, status);
-
-        List<Trip> tripsList = fetchTripsFromDatabase();
-        tripsList.add(newTrip);
-        dbHandler.writeObjects(TRIP_FILE_PATH, tripsList.toArray(new Trip[0]));
-    }
-
     @Override
     public void findTrip() {
         uiUtils.clearScreen();
 
         uiUtils.printFunctionName("TRIP SEARCH WIZARD", 100);
+        System.out.println();
 
         String tripIdToDisplay = inputValidation.idValidation("T", "Enter trip ID to search: ");
 
@@ -265,10 +244,13 @@ public class TripServicesAdmin extends AdminBaseServices implements TripCRUD {
 
         for (Trip trip : tripsList) {
             if (trip.getVehicle().equals(vehicle)) {
-                if (trip.getStatus().equals("Completed")) {
+                if (trip.getStatus().equals("COMPLETED")) {
                     continue;
                 }
-                if (trip.getStatus().equals("In Transit")) {
+                if (trip.getStatus().equals("IN_TRANSIT")) {
+                    return false;
+                }
+                if (trip.getStatus().equals("LOADING")) {
                     return false;
                 }
             }

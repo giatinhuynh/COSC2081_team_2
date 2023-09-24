@@ -6,6 +6,7 @@ import exceptions.TypeCheck;
 import interfaces.manager.ManagerPortInterface;
 import models.port.Port;
 import models.user.PortManager;
+import services.admin.PortServicesAdmin;
 import utils.Constants;
 import utils.CurrentUser;
 import utils.UiUtils;
@@ -24,6 +25,7 @@ public class PortServicesManager extends ManagerBaseServices implements ManagerP
     private final UiUtils uiUtils = new UiUtils();
     private final InputValidation inputValidation = new InputValidation();
     private final TypeCheck typeCheck = new TypeCheck();
+    private final PortServicesAdmin portServicesAdmin = new PortServicesAdmin();
 
     // Modularized method to fetch ports from the database
     private List<Port> fetchPortsFromDatabase() {
@@ -47,20 +49,23 @@ public class PortServicesManager extends ManagerBaseServices implements ManagerP
     public void viewPortInfo() {
         uiUtils.clearScreen();
 
-        uiUtils.printFunctionName("YOUR PORT INFORMATION", 100);
+        Port portToViewInfo = portServicesAdmin.getPortById(managedPort.getPortId());
+
+        uiUtils.printFunctionName("YOUR PORT INFORMATION", 53);
         System.out.println();
-        System.out.println("Port ID: " + managedPort.getPortId());
-        System.out.println("Port Name: " + managedPort.getName());
-        System.out.println("Port Latitude: " + managedPort.getLatitude());
-        System.out.println("Port Longitude: " + managedPort.getLongitude());
-        System.out.println("Port Storing Capacity: " + managedPort.getStoringCapacity());
-        System.out.println("Port Landing Ability: " + managedPort.getLandingAbility());
+        System.out.println("Port ID: " + portToViewInfo.getPortId());
+        System.out.println("Port Name: " + portToViewInfo.getName());
+        System.out.println("Port Latitude: " + portToViewInfo.getLatitude());
+        System.out.println("Port Longitude: " + portToViewInfo.getLongitude());
+        System.out.println("Port Storing Capacity: " + portToViewInfo.getStoringCapacity());
+        System.out.println("Port Landing Ability: " + portToViewInfo.getLandingAbility());
+        uiUtils.printHorizontalLine(53);
     }
 
     public void updatePortInfo() {
         uiUtils.clearScreen();
 
-        uiUtils.printFunctionName("UPDATE PORT INFORMATION WIZARD", 100);
+        uiUtils.printFunctionName("UPDATE PORT INFORMATION WIZARD", 53);
         System.out.println();
 
         String portIdToUpdate = managedPort.getPortId();
@@ -80,7 +85,7 @@ public class PortServicesManager extends ManagerBaseServices implements ManagerP
             String name = scanner.nextLine();
             if (!name.isEmpty()) {
                 if (typeCheck.isString(name)) {
-                    portToUpdate.setName(name);
+                    portToUpdate.setName(name.toUpperCase());
                 }
             }
 

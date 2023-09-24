@@ -1,5 +1,6 @@
 package views.flow;
 
+import exceptions.InputValidation;
 import views.BaseView;
 import services.manager.*;
 import utils.UiUtils;
@@ -14,19 +15,23 @@ public class PortManagerFlow extends BaseView {
     private final VehicleServicesManager vehicleServices = new VehicleServicesManager();
     private final ManagerStatistics statistics = new ManagerStatistics();
     private final UiUtils uiUtils = new UiUtils();
+    private final InputValidation inputValidation = new InputValidation();
 
     public void PortManagerMenu() throws ParseException {
         uiUtils.clearScreen();
         System.out.println("Welcome, Port Manager!");
-        displayHeader("PORT MANAGER MENU");
-        displayMessage("1. Manage Containers");
-        displayMessage("2. Manage Vehicles");
-        displayMessage("3. View Port Details");
-        displayMessage("4. Update Port Details");
-        displayMessage("5. View Statistics");
-        displayMessage("0. Logout");
+        System.out.println();
 
-        int choice = promptForInput("Enter you choice: ");
+        displayMenuHeader("PORT MANAGER MENU", 53);
+        displayOption("1. Manage Containers");
+        displayOption("2. Manage Vehicles");
+        displayOption("3. View Port Details");
+        displayOption("4. Update Port Details");
+        displayOption("5. View Statistics");
+        displayOption("0. Logout");
+        uiUtils.printHorizontalLine(53);
+
+        int choice = inputValidation.getChoice("Enter your choice (0-5): ", 0, 5);
         switch (choice) {
             case 1 -> PManagerContainerMenu();
             case 2 -> PManagerVehicleMenu();
@@ -51,19 +56,21 @@ public class PortManagerFlow extends BaseView {
 
     public void PManagerContainerMenu() throws ParseException {
         uiUtils.clearScreen();
-        displayMessage("=== PORT MANAGER CONTAINER MENU ===");
-        displayMessage("1. Load Container");
-        displayMessage("2. Unload Container");
-        displayMessage("===================================");
-        displayMessage("3. Add Existing Container");
-        displayMessage("4. Add New Container");
-        displayMessage("5. Update Container");
-        displayMessage("6. Delete Container");
-        displayMessage("7. Search Container");
-        displayMessage("8. View All Containers");
-        displayMessage("0. Back");
 
-        int choice = promptForInput("Enter you choice: ");
+        displayMenuHeader("PORT MANAGER CONTAINER MENU", 53);
+        displayOption("1. Load Container");
+        displayOption("2. Unload Container");
+        uiUtils.printHorizontalLine(53);
+        displayOption("3. Add Existing Container");
+        displayOption("4. Add New Container");
+        displayOption("5. Update Container");
+        displayOption("6. Delete Container");
+        displayOption("7. Search Container");
+        displayOption("8. View All Containers");
+        displayOption("0. Back");
+        uiUtils.printHorizontalLine(53);
+
+        int choice = inputValidation.getChoice("Enter you choice (0-8): ", 0, 8);
         switch (choice) {
             case 1 -> {
                 containerServices.loadContainerFlow();
@@ -116,19 +123,22 @@ public class PortManagerFlow extends BaseView {
 
     public void PManagerVehicleMenu() throws ParseException {
         uiUtils.clearScreen();
-        displayMessage("=== PORT MANAGER VEHICLE MENU ===");
-        displayMessage("1. Deploy Vehicle (Create Trip)");
-        displayMessage("2. Refuel Vehicle");
-        displayMessage("=================================");
-        displayMessage("3. Add Existing Vehicle");
-        displayMessage("4. Create New Vehicle");
-        displayMessage("5. Update Vehicle");
-        displayMessage("6. Delete Vehicle");
-        displayMessage("7. Search Vehicle");
-        displayMessage("8. View All Vehicles");
-        displayMessage("0. Back");
 
-        int choice = promptForInput("Enter you choice: ");
+        displayMenuHeader("PORT MANAGER VEHICLE MENU", 53);
+        displayOption("1. Deploy Vehicle (Create Trip)");
+        displayOption("2. Refuel Vehicle");
+        displayOption("3. Unload Vehicle");
+        uiUtils.printHorizontalLine(53);
+        displayOption("4. Add Existing Vehicle");
+        displayOption("5. Create New Vehicle");
+        displayOption("6. Update Vehicle");
+        displayOption("7. Delete Vehicle");
+        displayOption("8. Search Vehicle");
+        displayOption("9. View All Vehicles");
+        displayOption("0. Back");
+        uiUtils.printHorizontalLine(53);
+
+        int choice = inputValidation.getChoice("Enter you choice (0-8): ", 0, 9);
         switch (choice) {
             case 1 -> {
                 vehicleServices.deployVehicle();
@@ -141,31 +151,36 @@ public class PortManagerFlow extends BaseView {
                 PManagerVehicleMenu();
             }
             case 3 -> {
-                vehicleServices.addExistingVehicle();
+                vehicleServices.unloadVehicle();
                 backToMenu();
                 PManagerVehicleMenu();
             }
             case 4 -> {
-                vehicleServices.createNewVehicle();
+                vehicleServices.addExistingVehicle();
                 backToMenu();
                 PManagerVehicleMenu();
             }
             case 5 -> {
-                vehicleServices.updateVehicle();
+                vehicleServices.createNewVehicle();
                 backToMenu();
                 PManagerVehicleMenu();
             }
             case 6 -> {
-                vehicleServices.deleteVehicle();
+                vehicleServices.updateVehicle();
                 backToMenu();
                 PManagerVehicleMenu();
             }
             case 7 -> {
-                vehicleServices.findVehicle();
+                vehicleServices.deleteVehicle();
                 backToMenu();
                 PManagerVehicleMenu();
             }
             case 8 -> {
+                vehicleServices.findVehicle();
+                backToMenu();
+                PManagerVehicleMenu();
+            }
+            case 9 -> {
                 vehicleServices.displayAllVehicles();
                 backToMenu();
                 PManagerVehicleMenu();
@@ -180,14 +195,15 @@ public class PortManagerFlow extends BaseView {
 
     public void PManagerStatisticsMenu() throws ParseException {
         uiUtils.clearScreen();
-        displayMessage("=== PORT MANAGER STATISTICS MENU ===");
-        displayMessage("1. Daily Fuel Usage");
-        displayMessage("2. Weight of each type of container");
-        displayMessage("3. List ships in a port");
-        displayMessage("4. List trips in a day");
-        displayMessage("0. Back");
 
-        int choice = promptForInput("Enter you choice: ");
+        displayMenuHeader("PORT MANAGER STATISTICS MENU", 53);
+        displayOption("1. Daily Fuel Usage");
+        displayOption("2. Weight of each type of container");
+        displayOption("3. List ships in your port");
+        displayOption("4. List trips in a day");
+        displayOption("0. Back");
+
+        int choice = inputValidation.getChoice("Enter your choice (0-4): ", 0, 4);
         switch (choice) {
             case 1 -> {
                 statistics.displayFuelUsedInDay();
