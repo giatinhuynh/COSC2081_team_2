@@ -8,4 +8,4 @@ Group: Team Hi
 - Vu Minh Ha (s3978681)
 
 Github Repo URL: https://github.com/giatinhuynh/COSC2081_team_2.git
-Video link:
+Video link: https://youtu.be/SSlPTu1BZxA

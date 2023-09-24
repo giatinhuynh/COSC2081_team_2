@@ -50,7 +50,7 @@ The documentation can be found in the `docs/` folder or [here](link-to-documenta
 
 ## Video Demonstration
 Please watch our video demonstration to get an understanding of the functionalities and features of our port management system.  
-👉 [Watch Video](https://www.youtube.com/watch?v=your-video-id)
+👉 [Watch Video](https://youtu.be/SSlPTu1BZxA)
 
 ## License
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
