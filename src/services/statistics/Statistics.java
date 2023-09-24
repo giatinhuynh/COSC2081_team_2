@@ -11,7 +11,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public abstract class Statistics {
+public class Statistics {
 
     private final TripServicesAdmin tripController = new TripServicesAdmin();
     private final ContainerServicesAdmin containerController = new ContainerServicesAdmin();

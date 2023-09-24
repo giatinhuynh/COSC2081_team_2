@@ -1,10 +1,14 @@
 package exceptions;
 
+import java.text.ParseException;
+import java.util.Date;
 import java.util.Scanner;
+import java.text.SimpleDateFormat;
 
 public class InputValidation {
 
     private final Scanner scanner = new Scanner(System.in);
+    private final SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
 
     public boolean getBoolean(String prompt) {
         while (true) {
@@ -84,5 +88,44 @@ public class InputValidation {
                 System.out.println("Invalid input. Please enter a non-empty string.");
             }
         }
+    }
+
+    public Date getDate(String prompt) {
+        Date date = null;
+
+        while (date == null) {
+            System.out.print(prompt);
+            String input = scanner.nextLine();
+            try {
+                date = sdf.parse(input);
+            } catch (ParseException e) {
+                System.out.println("Invalid date format. Please use the format dd-MM-yyyy and try again.");
+            }
+        }
+
+        return date;
+    }
+
+    public int getChoice(String prompt, int start, int end) {
+        Scanner scanner = new Scanner(System.in);
+        int choice = -1;
+
+        do {
+            System.out.print(prompt);
+
+            try {
+                choice = Integer.parseInt(scanner.nextLine());
+
+                if (choice >= start && choice <= end) {
+                    break; // Valid choice
+                } else {
+                    System.out.println("Please enter a number between " + start + " and " + end + ".");
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input. Please enter a valid number.");
+            }
+        } while (true);
+
+        return choice;
     }
 }

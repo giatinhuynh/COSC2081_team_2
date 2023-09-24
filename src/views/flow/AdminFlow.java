@@ -1,5 +1,6 @@
 package views.flow;
 
+import exceptions.InputValidation;
 import services.admin.*;
 import services.statistics.PortStatistics;
 import services.statistics.TripStatistics;
@@ -20,20 +21,25 @@ public class AdminFlow extends BaseView {
     private final PortStatistics portStatistics = new PortStatistics();
     private final VehicleStatistics vehicleStatistics = new VehicleStatistics();
     private final TripStatistics tripStatistics = new TripStatistics();
+    private final InputValidation inputValidation = new InputValidation();
 
     public void displayAdminMenu() {
-        uiUtils.clearScreen(); // Clear the screen for a fresh view. This method needs to be implemented.
+        uiUtils.clearScreen();
+
         System.out.println("Welcome, System Admin!");
-        displayHeader("ADMIN MENU");
-        displayMessage("1. Manage Ports");
-        displayMessage("2. Manage Containers");
-        displayMessage("3. Manage Vehicles");
-        displayMessage("4. Manage Users");
-        displayMessage("5. Manage Trips");
-        displayMessage("6. Statistics");
-        displayMessage("0. Logout");
-        displayHorizontalLine();
-        int choice = promptForInput("Enter your choice (0-6): ");
+        System.out.println();
+
+        displayMenuHeader("ADMIN MENU", 53);
+        displayOption("1. Manage Ports");
+        displayOption("2. Manage Containers");
+        displayOption("3. Manage Vehicles");
+        displayOption("4. Manage Users");
+        displayOption("5. Manage Trips");
+        displayOption("6. Statistics");
+        displayOption("0. Logout");
+        uiUtils.printHorizontalLine(53);
+
+        int choice = inputValidation.getChoice("Enter your choice (0-6): ", 0, 6);
         switch (choice) {
             case 1 -> displayAdminPortsMenu();
             case 2 -> displayAdminContainersMenu();
@@ -51,15 +57,17 @@ public class AdminFlow extends BaseView {
 
     public void displayAdminPortsMenu() {
         uiUtils.clearScreen();
-        displayHeader("ADMIN PORTS MENU");
-        displayMessage("1. Add Port");
-        displayMessage("2. Update Port");
-        displayMessage("3. Delete Port");
-        displayMessage("4. Search Port");
-        displayMessage("5. View All Ports");
-        displayMessage("0. Back");
-        displayHorizontalLine();
-        int choice = promptForInput("Enter your choice (0-5): ");
+
+        displayMenuHeader("ADMIN PORTS MENU", 53);
+        displayOption("1. Add Port");
+        displayOption("2. Update Port");
+        displayOption("3. Delete Port");
+        displayOption("4. Search Port");
+        displayOption("5. View All Ports");
+        displayOption("0. Back");
+        uiUtils.displayHorizontalLine(53);
+
+        int choice = inputValidation.getChoice("Enter your choice (0-5): ", 0, 5);
         switch (choice) {
             case 1 -> {
                 adminPortController.createNewPort();
@@ -97,15 +105,16 @@ public class AdminFlow extends BaseView {
 
     public void displayAdminContainersMenu() {
         uiUtils.clearScreen();
-        displayHeader("ADMIN CONTAINERS MENU");
-        displayMessage("1. Add Container");
-        displayMessage("2. Update Container");
-        displayMessage("3. Delete Container");
-        displayMessage("4. Search Container");
-        displayMessage("5. View All Containers");
-        displayMessage("0. Back");
 
-        int choice = promptForInput("Enter your choice: ");
+        displayMenuHeader("ADMIN CONTAINERS MENU", 53);
+        displayOption("1. Add Container");
+        displayOption("2. Update Container");
+        displayOption("3. Delete Container");
+        displayOption("4. Search Container");
+        displayOption("5. View All Containers");
+        displayOption("0. Back");
+
+        int choice = inputValidation.getChoice("Enter your choice (0-5): ", 0, 5);
         switch (choice) {
             case 1 -> {
                 adminContainerController.createNewContainer();
@@ -144,15 +153,17 @@ public class AdminFlow extends BaseView {
 
     public void displayAdminVehiclesMenu() {
         uiUtils.clearScreen();
-        displayHeader("ADMIN VEHICLES MENU");
-        displayMessage("1. Add Vehicle");
-        displayMessage("2. Update Vehicle");
-        displayMessage("3. Delete Vehicle");
-        displayMessage("4. Search Vehicle");
-        displayMessage("5. View All Vehicles");
-        displayMessage("0. Back");
 
-        int choice = promptForInput("Enter your choice: ");
+        displayMenuHeader("ADMIN VEHICLES MENU", 53);
+        displayOption("1. Add Vehicle");
+        displayOption("2. Update Vehicle");
+        displayOption("3. Delete Vehicle");
+        displayOption("4. Search Vehicle");
+        displayOption("5. View All Vehicles");
+        displayOption("0. Back");
+        uiUtils.displayHorizontalLine(53);
+
+        int choice = inputValidation.getChoice("Enter your choice (0-5): ", 0, 5);
         switch (choice) {
             case 1 -> {
                 adminVehicleController.createNewVehicle();
@@ -190,15 +201,17 @@ public class AdminFlow extends BaseView {
 
     public void displayAdminUsersMenu() {
         uiUtils.clearScreen();
-        displayHeader("ADMIN USERS MENU");
-        displayMessage("1. Add Port Manager");
-        displayMessage("2. Update Port Manager");
-        displayMessage("3. Delete Port Manager");
-        displayMessage("4. Search Port Manager");
-        displayMessage("5. View All Port Managers");
-        displayMessage("0. Back");
 
-        int choice = promptForInput("Enter your choice: ");
+        displayMenuHeader("ADMIN USERS MENU", 53);
+        displayOption("1. Add Port Manager");
+        displayOption("2. Update Port Manager");
+        displayOption("3. Delete Port Manager");
+        displayOption("4. Search Port Manager");
+        displayOption("5. View All Port Managers");
+        displayOption("0. Back");
+        uiUtils.displayHorizontalLine(53);
+
+        int choice = inputValidation.getChoice("Enter your choice (0-5): ", 0, 5);
         switch (choice) {
             case 1 -> {
                 adminUserController.createNewUser();
@@ -235,15 +248,16 @@ public class AdminFlow extends BaseView {
 
     public void displayAdminTripsMenu() {
         uiUtils.clearScreen();
-        displayHeader("ADMIN TRIPS MENU");
-        displayMessage("1. Add Trip");
-        displayMessage("2. Update Trip");
-        displayMessage("3. Delete Trip");
-        displayMessage("4. Search Trip");
-        displayMessage("5. View All Trips");
-        displayMessage("0. Back");
 
-        int choice = promptForInput("Enter your choice: ");
+        displayMenuHeader("ADMIN TRIPS MENU", 53);
+        displayOption("1. Add Trip");
+        displayOption("2. Update Trip");
+        displayOption("3. Delete Trip");
+        displayOption("4. Search Trip");
+        displayOption("5. View All Trips");
+        displayOption("0. Back");
+
+        int choice = inputValidation.getChoice("Enter your choice (0-5): ", 0, 5);
         switch (choice) {
             case 1 -> {
                 adminTripController.createTrip();
@@ -281,14 +295,16 @@ public class AdminFlow extends BaseView {
 
     public void displayAdminStatisticsMenu () {
         uiUtils.clearScreen();
-        displayHeader("ADMIN STATISTICS MENU");
-        displayMessage("1. View Port Statistics");
-        displayMessage("2. View Container Statistics");
-        displayMessage("3. View Vehicle Statistics");
-        displayMessage("4. View Trip Statistics");
-        displayMessage("0. Back");
 
-        int choice = promptForInput("Enter your choice: ");
+        displayMenuHeader("ADMIN STATISTICS MENU", 53);
+        displayOption("1. View Port Statistics");
+        displayOption("2. View Container Statistics");
+        displayOption("3. View Vehicle Statistics");
+        displayOption("4. View Trip Statistics");
+        displayOption("0. Back");
+        uiUtils.printHorizontalLine(53);
+
+        int choice = inputValidation.getChoice("Enter your choice (0-4): ", 0, 4);
         switch (choice) {
             case 1 -> {
                 uiUtils.clearScreen();

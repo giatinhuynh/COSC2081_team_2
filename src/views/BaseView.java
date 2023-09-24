@@ -21,15 +21,28 @@ import java.util.Scanner;
 public abstract class BaseView {
     protected Scanner scanner = new Scanner(System.in);
 
-    protected void displayHeader(String title) {
-        int width = 30;
-        int padding = (width - title.length()) / 2;
+    public void displayMenuHeader(String menuName, int... widths) {
+        int totalWidth = 0;
+        for (int width : widths) {
+            // 3 extra characters account for spaces and the "|"
+            totalWidth += width + 3;
+        }
 
-        String coloredTitle = "\u001B[33m" + title + "\u001B[0m"; // Yellow color
+        // Length of the border without the table name
+        int remainingWidth = totalWidth - menuName.length() - 2; // subtract 2 for the spaces around the table name
+        int halfWidth = remainingWidth / 2;
 
-        displayMessage("-".repeat(padding) + coloredTitle + "-".repeat(padding));
+        for (int i = 0; i < halfWidth; i++) {
+            System.out.print("-");
+        }
+
+        System.out.print(" " +"\u001B[1m" + "\u001B[32m" + menuName + "\u001B[0m" + "\u001B[0m"  + " ");
+
+        for (int i = halfWidth + menuName.length() + 2; i < totalWidth + 1; i++) {
+            System.out.print("-");
+        }
+        System.out.println();
     }
-
 
     protected void displayHorizontalLine() {
         displayMessage("-".repeat(30));
@@ -37,6 +50,10 @@ public abstract class BaseView {
 
     protected void displayMessage(String message) {
         System.out.println(message);
+    }
+
+    protected void displayOption(String option) {
+        System.out.printf("| %-53s |\n", option);
     }
 
     protected int promptForInput(String prompt) {

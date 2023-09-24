@@ -3,6 +3,7 @@ package views.flow;
 import views.BaseView;
 import services.manager.*;
 import utils.UiUtils;
+import views.statistics.ManagerStatistics;
 
 import java.text.ParseException;
 
@@ -11,6 +12,7 @@ public class PortManagerFlow extends BaseView {
     private final PortServicesManager portServices = new PortServicesManager();
     private final ContainerServicesManager containerServices = new ContainerServicesManager();
     private final VehicleServicesManager vehicleServices = new VehicleServicesManager();
+    private final ManagerStatistics statistics = new ManagerStatistics();
     private final UiUtils uiUtils = new UiUtils();
 
     public void PortManagerMenu() throws ParseException {
@@ -187,6 +189,26 @@ public class PortManagerFlow extends BaseView {
 
         int choice = promptForInput("Enter you choice: ");
         switch (choice) {
+            case 1 -> {
+                statistics.displayFuelUsedInDay();
+                backToMenu();
+                PManagerStatisticsMenu();
+            }
+            case 2 -> {
+                statistics.displayWeightOfContainerByType();
+                backToMenu();
+                PManagerStatisticsMenu();
+            }
+            case 3 -> {
+                statistics.displayAllShipsInPort();
+                backToMenu();
+                PManagerStatisticsMenu();
+            }
+            case 4 -> {
+                statistics.displayAllTripsInDuration();
+                backToMenu();
+                PManagerStatisticsMenu();
+            }
             case 0 -> PortManagerMenu();
             default -> {
                 displayMessage("Invalid choice. Please try again.");
