@@ -51,17 +51,21 @@ public class ContainerServicesAdmin extends AdminBaseServices implements Contain
     }
 
     // Modularized method to find a container by its ID
-    private Optional<Container> findContainerById(String containerId) {
+    public Optional<Container> findContainerById(String containerId) {
         return fetchContainersFromDatabase().stream()
                 .filter(container -> container.getContainerId().equals(containerId))
                 .findFirst();
     }
 
+    public Container getContainerById(String containerId) {
+        return fetchContainersFromDatabase().stream()
+                .filter(container -> container.getContainerId().equals(containerId))
+                .findFirst().orElse(null);
+    }
+
     public boolean uniqueContainerIdCheck(String containerId) {
         if (findContainerById(containerId).isPresent()) {
             uiUtils.printFailedMessage("Container with ID " + containerId + " already exists.");
-            System.out.println("Press enter to try again...");
-            scanner.nextLine();
             return false;
         }
         return true;
@@ -75,10 +79,10 @@ public class ContainerServicesAdmin extends AdminBaseServices implements Contain
         uiUtils.printFunctionName("CONTAINER CREATION WIZARD", 100);
         System.out.println();
 
-        String containerId = inputValidation.idValidation("C", "Enter container ID to create: ");
-        if (!uniqueContainerIdCheck(containerId)) {
-            return;  // Exit the creation process if the ID is not unique
-        }
+        String containerId;
+        do {
+            containerId = inputValidation.idValidation("C", "Enter container ID to create: ");
+        } while (!uniqueContainerIdCheck(containerId));  // Keep asking until a unique ID is provided
         System.out.println();
 
         double weight = inputValidation.getDouble("Enter container weight:");
@@ -169,14 +173,18 @@ public class ContainerServicesAdmin extends AdminBaseServices implements Contain
     }
 
     public void displayContainerTableRow(Container container) {
-        if (container.getCurrentPort() == null) {
+        if (container.getCurrentPort() == null && container.getCurrentVehicle() == null) {
             System.out.printf("| %-15s | %-20s | %-15.2f | %-20s |\n",
                     container.getContainerId(), container.getContainerType(),
                     container.getWeight(), "N/A");
+        } else if (container.getCurrentPort() == null) {
+            System.out.printf("| %-15s | %-20s | %-15.2f | %-20s |\n",
+                    container.getContainerId(), container.getContainerType(),
+                    container.getWeight(), container.getCurrentVehicle().getName());
         } else {
             System.out.printf("| %-15s | %-20s | %-15.2f | %-20s |\n",
                     container.getContainerId(), container.getContainerType(),
-                    container.getWeight(), container.getLocation());
+                    container.getWeight(), container.getCurrentPort().getName());
         }
     }
 

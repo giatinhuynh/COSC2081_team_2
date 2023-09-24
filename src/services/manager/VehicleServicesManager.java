@@ -5,6 +5,7 @@ import exceptions.InputValidation;
 import exceptions.TypeCheck;
 import interfaces.CRUD.VehicleCRUD;
 import interfaces.manager.ManagerVehicleInterface;
+import models.container.Container;
 import models.port.Port;
 import models.trip.Trip;
 import models.user.PortManager;
@@ -54,17 +55,21 @@ public class VehicleServicesManager extends ManagerBaseServices implements Vehic
     public void refuelVehicle() {
         uiUtils.clearScreen();
 
-        uiUtils.printFunctionName("REFUEL VEHICLE", 100);
+        uiUtils.printFunctionName("REFUEL VEHICLE", 82);
+        System.out.println();
         System.out.println();
 
         // Display all vehicles at the managed port
         List<Vehicle> vehicles = vehicleController.fetchVehiclesFromDatabase();
         uiUtils.printTopBorderWithTableName("VEHICLES AT YOUR PORT", 15, 15, 20, 20);
-        System.out.printf("| %-15s | %-15s | %-20s | %-20s ", "Vehicle ID", "Licensed Plate", "Current Fuel", "Fuel Capacity");
+        System.out.printf("| %-15s | %-15s | %-20s | %-20s |\n", "Vehicle ID", "Licensed Plate", "Current Fuel", "Fuel Capacity");
         uiUtils.printHorizontalLine(15, 15, 20, 20);
         for (Vehicle vehicle : vehicles) {
+            if (vehicle.getCurrentPort() == null) {
+                continue;
+            }
             if (vehicle.getCurrentPort().getPortId().equals(managedPort.getPortId())) {
-                System.out.printf("| %-15s | %-15s | %-20.2f | %-20.2f ", vehicle.getVehicleId(), vehicle.getName(), vehicle.getCurrentFuel(), vehicle.getFuelCapacity());
+                System.out.printf("| %-15s | %-15s | %-20.2f | %-20.2f |\n", vehicle.getVehicleId(), vehicle.getName(), vehicle.getCurrentFuel(), vehicle.getFuelCapacity());
             }
         }
         uiUtils.printHorizontalLine(15, 15, 20, 20);
@@ -74,12 +79,28 @@ public class VehicleServicesManager extends ManagerBaseServices implements Vehic
         // Get input for vehicle id
         String vehicleId = inputValidation.idValidation("V", "Enter the vehicle ID you want to refuel:");
         System.out.println();
-        Vehicle selectedVehicle = findVehicleById(vehicleId);
+        Vehicle selectedVehicle = null;
+        for (Vehicle vehicle : vehicles) {
+            if (vehicle.getVehicleId().equals(vehicleId)) {
+                if (vehicle.getCurrentPort() == null) {
+                    uiUtils.printFailedMessage("This vehicle is not at your port!");
+                    return;
+                }
+                if (vehicle.getCurrentPort().getPortId().equals(managedPort.getPortId())) {
+                    selectedVehicle = vehicleController.getVehicleById(vehicleId);
+                    break;  // Use break here instead of return
+                }
+            }
+        }
 
-        // Process the fueling
-        selectedVehicle.refuel();
-        vehicleController.updateVehicleInDatabase(selectedVehicle);
-        uiUtils.printSuccessMessage("Refuel successful!");
+        if (selectedVehicle != null) {
+            // Process the fueling
+            selectedVehicle.refuel();
+            vehicleController.updateVehicleInDatabase(selectedVehicle);
+            uiUtils.printSuccessMessage("Refuel successful!");
+        } else {
+            uiUtils.printFailedMessage("No vehicle found with the given ID.");
+        }
     }
 
     public void deployVehicle() throws ParseException {
@@ -94,6 +115,9 @@ public class VehicleServicesManager extends ManagerBaseServices implements Vehic
         uiUtils.printHorizontalLine(15, 20, 20, 25, 20, 15, 15);
         for (Vehicle vehicle : vehicleList) {
             if (tripController.vehicleAvailCheck(vehicle)) {
+                if (vehicle.getCurrentPort() == null) {
+                    continue;
+                }
                 if (vehicle.getCurrentPort().getPortId().equals(managedPort.getPortId())) {
                     String vehicleType = "";
                     String truckType = "N/A";
@@ -116,41 +140,98 @@ public class VehicleServicesManager extends ManagerBaseServices implements Vehic
         // Get input for vehicle id
         String vehicleId = inputValidation.idValidation("V", "Enter the vehicle ID you want to deploy:");
         System.out.println();
-        Vehicle selectedVehicle = findVehicleById(vehicleId);
+        Vehicle selectedVehicle = vehicleController.getVehicleById(vehicleId);
 
-       // Ask for destination port
-        System.out.println("Enter the destination port ID:");
-        String destinationPortId = inputValidation.idValidation("P", "Enter the destination port ID:");
-        Port selectedDestinationPort = portController.getPortById(destinationPortId);
+        if (selectedVehicle != null) {
+            // Ask for destination port
+            System.out.println("Enter the destination port ID:");
+            String destinationPortId = inputValidation.idValidation("P", "Enter the destination port ID:");
+            Port selectedDestinationPort = portController.getPortById(destinationPortId);
 
-        // Ask for departure date
-        System.out.println("Enter the departure date (dd-MM-yyyy):");
-        String departureDateString = scanner.nextLine();
-        Date departureDate = sdf.parse(departureDateString);
+            // Ask for departure date
+            System.out.println("Enter the departure date (dd-MM-yyyy):");
+            String departureDateString = scanner.nextLine();
+            Date departureDate = sdf.parse(departureDateString);
 
-        // Calculate arrival date
-        Date arrivalDate = sdf.parse(dateUtils.hoursToDate(selectedVehicle.calculateTimeNeeded(selectedDestinationPort), "yyyy-MM-dd"));
+            // Calculate arrival date
+            Date arrivalDate = sdf.parse(dateUtils.hoursToDate(selectedVehicle.calculateTimeNeeded(selectedDestinationPort), "yyyy-MM-dd"));
 
-        // Calculate fuel needed
-        double fuelNeeded = selectedVehicle.calculateFuelNeeded(selectedDestinationPort);
-        // Check if the vehicle has enough fuel
-        if (fuelNeeded > selectedVehicle.getCurrentFuel()) {
-            System.out.println("Not enough fuel! Do you want to refuel? (Y/N)");
-            String refuelChoice = scanner.nextLine();
-            if (refuelChoice.equals("Y")) {
-                selectedVehicle.refuel();
-                System.out.println("Refuel successful!");
-            } else {
-                System.out.println("Refuel cancelled.");
-                return;
+            // Calculate fuel needed
+            double fuelNeeded = selectedVehicle.calculateFuelNeeded(selectedDestinationPort);
+            // Check if the vehicle has enough fuel
+            if (fuelNeeded > selectedVehicle.getCurrentFuel()) {
+                System.out.println("Not enough fuel! Do you want to refuel? (Y/N)");
+                String refuelChoice = scanner.nextLine();
+                if (refuelChoice.equals("Y")) {
+                    selectedVehicle.refuel();
+                    System.out.println("Refuel successful!");
+                } else {
+                    System.out.println("Refuel cancelled.");
+                    return;
+                }
+            }
+
+            // Create the trip
+            Trip newTrip = new Trip(generateNextTripId(), selectedVehicle, managedPort, selectedDestinationPort, departureDate);
+
+            List<Trip> tripList = tripController.fetchTripsFromDatabase();
+            tripList.add(newTrip);
+            dbHandler.writeObjects(TRIP_FILE_PATH, tripList.toArray(new Trip[0]));
+
+            // Send message to the user
+            uiUtils.printSuccessMessage("Vehicle deployed successfully!");
+        } else {
+            uiUtils.printFailedMessage("No vehicle found with the given ID.");
+        }
+    }
+
+    public void unloadVehicle() {
+        uiUtils.clearScreen();
+
+        uiUtils.printFunctionName("UNLOAD VEHICLE", 82);
+        System.out.println();
+
+        // Display all vehicles at the managed port
+        List<Vehicle> vehicles = vehicleController.fetchVehiclesFromDatabase();
+        uiUtils.printTopBorderWithTableName("LOADED VEHICLES AT YOUR PORT", 15, 15, 20, 20);
+        System.out.printf("| %-15s | %-15s | %-20s | %-20s |\n", "Vehicle ID", "Licensed Plate", "Current Fuel", "Fuel Capacity");
+        uiUtils.printHorizontalLine(15, 15, 20, 20);
+        for (Vehicle vehicle : vehicles) {
+            if (vehicle.getCurrentPort() == null) {
+                continue;
+            }
+            if (vehicle.getCurrentPort().getPortId().equals(managedPort.getPortId())) {
+                if (!vehicle.getContainers().isEmpty()) {
+                    System.out.printf("| %-15s | %-15s | %-20.2f | %-20.2f |\n", vehicle.getVehicleId(), vehicle.getName(), vehicle.getCurrentFuel(), vehicle.getFuelCapacity());
+                }
             }
         }
+        uiUtils.printHorizontalLine(15, 15, 20, 20);
 
-        // Create the trip
-        tripController.createNewTrip(selectedVehicle, managedPort, selectedDestinationPort, departureDate, arrivalDate, Trip.Status.valueOf("LOADING"));
+        // Get input for vehicle id
+        String vehicleId = inputValidation.idValidation("V", "Enter the vehicle ID you want to unload:");
+        System.out.println();
+        Vehicle selectedVehicle = vehicleController.getVehicleById(vehicleId);
 
-        // Send message to the user
-        uiUtils.printSuccessMessage("Vehicle deployed successfully!");
+        if (selectedVehicle != null) {
+            selectedVehicle.emptyContainers();
+            vehicleController.updateVehicleInDatabase(selectedVehicle);
+            uiUtils.printSuccessMessage("Unload successful!");
+        } else {
+            uiUtils.printFailedMessage("No vehicle found with the given ID.");
+        }
+    }
+
+    private String generateNextTripId() {
+        List<Trip> tripsList = tripController.fetchTripsFromDatabase();
+
+        if (tripsList.isEmpty()) {
+            return "T-000001"; // Starting ID
+        } else {
+            String lastTripId = tripsList.get(tripsList.size() - 1).getTripId();
+            int nextId = Integer.parseInt(lastTripId.substring(2)) + 1;  // start at index 2 to skip "T-"
+            return String.format("T-%06d", nextId);
+        }
     }
 
     public void addExistingVehicle() {
@@ -188,26 +269,28 @@ public class VehicleServicesManager extends ManagerBaseServices implements Vehic
         String vehicleId = inputValidation.idValidation("V", "Enter the vehicle ID you want to add:");
         System.out.println();
 
-        Vehicle vehicleToAdd = null;
-        int indexToUpdate = -1;
-        for (int i = 0; i < vehicleList.size(); i++) {
-            if (vehicleList.get(i).getVehicleId().equals(vehicleId) && vehicleList.get(i).getCurrentPort() == null) {
-                vehicleToAdd = vehicleList.get(i);
-                indexToUpdate = i;
-                break;
+        Vehicle vehicleToAdd = findUnoccupiedVehicleById(vehicleList, vehicleId);
+
+        if (vehicleToAdd == null) {
+            uiUtils.printFailedMessage("No unoccupied vehicle with ID " + vehicleId + " found!");
+            return;
+        }
+
+        managedPort.addVehicle(vehicleToAdd);
+        vehicleToAdd.setCurrentPort(managedPort);
+
+        vehicleController.updateVehicleInDatabase(vehicleToAdd);
+
+        uiUtils.printSuccessMessage("Vehicle with ID " + vehicleId + " added successfully!");
+    }
+
+    private Vehicle findUnoccupiedVehicleById(List<Vehicle> vehicleList, String vehicleId) {
+        for (Vehicle vehicle : vehicleList) {
+            if (vehicle.getVehicleId().equals(vehicleId) && vehicle.getCurrentPort() == null) {
+                return vehicle;
             }
         }
-
-        if (vehicleToAdd != null) {
-            managedPort.addVehicle(vehicleToAdd);
-
-            vehicleToAdd.setCurrentPort(managedPort);
-            vehicleController.updateVehicleInDatabase(vehicleToAdd);
-
-            uiUtils.printSuccessMessage("Vehicle with ID " + vehicleId + "added successfully!");
-        } else {
-            uiUtils.printFailedMessage("No vehicle with ID " + vehicleId + " found!");
-        }
+        return null;
     }
 
     @Override
@@ -217,7 +300,10 @@ public class VehicleServicesManager extends ManagerBaseServices implements Vehic
         uiUtils.printFunctionName("VEHICLE CREATION WIZARD", 100);
         System.out.println();
 
-        String vehicleId = inputValidation.idValidation("V", "Enter vehicle ID: ");
+        String vehicleId;
+        do {
+            vehicleId = inputValidation.idValidation("C", "Enter vehicle ID to create: ");
+        } while (!vehicleController.uniqueVehicleIdCheck(vehicleId));  // Keep asking until a unique ID is provided
         System.out.println();
 
         String name = inputValidation.getString("Enter vehicle name:");
@@ -255,6 +341,7 @@ public class VehicleServicesManager extends ManagerBaseServices implements Vehic
         List<Vehicle> vehiclesList = vehicleController.fetchVehiclesFromDatabase();
         vehiclesList.add(newVehicle);
         dbHandler.writeObjects(VEHICLE_FILE_PATH, vehiclesList.toArray(new Vehicle[0]));
+        uiUtils.printSuccessMessage("Vehicle with ID " + vehicleId + " created successfully.");
     }
 
     @Override
@@ -307,6 +394,7 @@ public class VehicleServicesManager extends ManagerBaseServices implements Vehic
     @Override
     public void displayAllVehicles() {
         uiUtils.clearScreen();
+
         List<Vehicle> vehiclesList = vehicleController.fetchVehiclesFromDatabase();
 
         uiUtils.printTopBorderWithTableName("VEHICLES INFORMATION", 15, 20, 20, 25, 20, 15, 15);
@@ -316,6 +404,9 @@ public class VehicleServicesManager extends ManagerBaseServices implements Vehic
         uiUtils.printHorizontalLine(15, 20, 20, 25, 20, 15, 15);
 
         for (Vehicle vehicle : vehiclesList) {
+            if (vehicle.getCurrentPort() == null) {
+                continue;
+            }
             if (vehicle.getCurrentPort().getPortId().equals(managedPort.getPortId())) {
                 String vehicleType = "";
                 String truckType = "N/A";

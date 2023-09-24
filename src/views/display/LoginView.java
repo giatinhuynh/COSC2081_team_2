@@ -57,10 +57,10 @@ public class LoginView extends BaseView {
         printSeparator(30);
 
         System.out.print("Username: ");
-        String username = scanner.nextLine();
+        String username = scanner.nextLine().trim();
 
         System.out.print("Password: ");
-        String password = readPassword();
+        String password = readPassword().trim();
 
         // Validate the user's credentials.
         User loggedInUser = userController.loginValidation(username, password);
