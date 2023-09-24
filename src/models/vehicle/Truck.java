@@ -28,12 +28,21 @@ public class Truck extends Vehicle {
 
     @Override
     public boolean canCarry(Container container) {
+        if (container == null) {
+            throw new IllegalArgumentException("Container argument cannot be null.");
+        }
+
+        if (type == null) {
+            throw new IllegalStateException("Vehicle type cannot be null.");
+        }
+
         return switch (type) {
-            case BASIC ->
-                    container instanceof DryStorage || container instanceof OpenTop || container instanceof OpenSide;
+            case BASIC -> container instanceof DryStorage ||
+                    container instanceof OpenTop ||
+                    container instanceof OpenSide;
             case REEFER -> container instanceof Refrigerated;
             case TANKER -> container instanceof Liquid;
-            default -> false;
+            default -> throw new UnsupportedOperationException("Unexpected vehicle type: " + type);
         };
     }
 

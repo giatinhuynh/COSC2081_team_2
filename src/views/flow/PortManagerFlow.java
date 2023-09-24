@@ -127,17 +127,18 @@ public class PortManagerFlow extends BaseView {
         displayMenuHeader("PORT MANAGER VEHICLE MENU", 53);
         displayOption("1. Deploy Vehicle (Create Trip)");
         displayOption("2. Refuel Vehicle");
+        displayOption("3. Unload Vehicle");
         uiUtils.printHorizontalLine(53);
-        displayOption("3. Add Existing Vehicle");
-        displayOption("4. Create New Vehicle");
-        displayOption("5. Update Vehicle");
-        displayOption("6. Delete Vehicle");
-        displayOption("7. Search Vehicle");
-        displayOption("8. View All Vehicles");
+        displayOption("4. Add Existing Vehicle");
+        displayOption("5. Create New Vehicle");
+        displayOption("6. Update Vehicle");
+        displayOption("7. Delete Vehicle");
+        displayOption("8. Search Vehicle");
+        displayOption("9. View All Vehicles");
         displayOption("0. Back");
         uiUtils.printHorizontalLine(53);
 
-        int choice = inputValidation.getChoice("Enter you choice (0-8): ", 0, 8);
+        int choice = inputValidation.getChoice("Enter you choice (0-8): ", 0, 9);
         switch (choice) {
             case 1 -> {
                 vehicleServices.deployVehicle();
@@ -150,31 +151,36 @@ public class PortManagerFlow extends BaseView {
                 PManagerVehicleMenu();
             }
             case 3 -> {
-                vehicleServices.addExistingVehicle();
+                vehicleServices.unloadVehicle();
                 backToMenu();
                 PManagerVehicleMenu();
             }
             case 4 -> {
-                vehicleServices.createNewVehicle();
+                vehicleServices.addExistingVehicle();
                 backToMenu();
                 PManagerVehicleMenu();
             }
             case 5 -> {
-                vehicleServices.updateVehicle();
+                vehicleServices.createNewVehicle();
                 backToMenu();
                 PManagerVehicleMenu();
             }
             case 6 -> {
-                vehicleServices.deleteVehicle();
+                vehicleServices.updateVehicle();
                 backToMenu();
                 PManagerVehicleMenu();
             }
             case 7 -> {
-                vehicleServices.findVehicle();
+                vehicleServices.deleteVehicle();
                 backToMenu();
                 PManagerVehicleMenu();
             }
             case 8 -> {
+                vehicleServices.findVehicle();
+                backToMenu();
+                PManagerVehicleMenu();
+            }
+            case 9 -> {
                 vehicleServices.displayAllVehicles();
                 backToMenu();
                 PManagerVehicleMenu();

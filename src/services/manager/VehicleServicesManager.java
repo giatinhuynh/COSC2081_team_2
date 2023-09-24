@@ -55,17 +55,21 @@ public class VehicleServicesManager extends ManagerBaseServices implements Vehic
     public void refuelVehicle() {
         uiUtils.clearScreen();
 
-        uiUtils.printFunctionName("REFUEL VEHICLE", 100);
+        uiUtils.printFunctionName("REFUEL VEHICLE", 82);
+        System.out.println();
         System.out.println();
 
         // Display all vehicles at the managed port
         List<Vehicle> vehicles = vehicleController.fetchVehiclesFromDatabase();
         uiUtils.printTopBorderWithTableName("VEHICLES AT YOUR PORT", 15, 15, 20, 20);
-        System.out.printf("| %-15s | %-15s | %-20s | %-20s ", "Vehicle ID", "Licensed Plate", "Current Fuel", "Fuel Capacity");
+        System.out.printf("| %-15s | %-15s | %-20s | %-20s |\n", "Vehicle ID", "Licensed Plate", "Current Fuel", "Fuel Capacity");
         uiUtils.printHorizontalLine(15, 15, 20, 20);
         for (Vehicle vehicle : vehicles) {
+            if (vehicle.getCurrentPort() == null) {
+                continue;
+            }
             if (vehicle.getCurrentPort().getPortId().equals(managedPort.getPortId())) {
-                System.out.printf("| %-15s | %-15s | %-20.2f | %-20.2f ", vehicle.getVehicleId(), vehicle.getName(), vehicle.getCurrentFuel(), vehicle.getFuelCapacity());
+                System.out.printf("| %-15s | %-15s | %-20.2f | %-20.2f |\n", vehicle.getVehicleId(), vehicle.getName(), vehicle.getCurrentFuel(), vehicle.getFuelCapacity());
             }
         }
         uiUtils.printHorizontalLine(15, 15, 20, 20);
@@ -75,12 +79,28 @@ public class VehicleServicesManager extends ManagerBaseServices implements Vehic
         // Get input for vehicle id
         String vehicleId = inputValidation.idValidation("V", "Enter the vehicle ID you want to refuel:");
         System.out.println();
-        Vehicle selectedVehicle = findVehicleById(vehicleId);
+        Vehicle selectedVehicle = null;
+        for (Vehicle vehicle : vehicles) {
+            if (vehicle.getVehicleId().equals(vehicleId)) {
+                if (vehicle.getCurrentPort() == null) {
+                    uiUtils.printFailedMessage("This vehicle is not at your port!");
+                    return;
+                }
+                if (vehicle.getCurrentPort().getPortId().equals(managedPort.getPortId())) {
+                    selectedVehicle = vehicleController.getVehicleById(vehicleId);
+                    break;  // Use break here instead of return
+                }
+            }
+        }
 
-        // Process the fueling
-        selectedVehicle.refuel();
-        vehicleController.updateVehicleInDatabase(selectedVehicle);
-        uiUtils.printSuccessMessage("Refuel successful!");
+        if (selectedVehicle != null) {
+            // Process the fueling
+            selectedVehicle.refuel();
+            vehicleController.updateVehicleInDatabase(selectedVehicle);
+            uiUtils.printSuccessMessage("Refuel successful!");
+        } else {
+            uiUtils.printFailedMessage("No vehicle found with the given ID.");
+        }
     }
 
     public void deployVehicle() throws ParseException {
@@ -120,13 +140,7 @@ public class VehicleServicesManager extends ManagerBaseServices implements Vehic
         // Get input for vehicle id
         String vehicleId = inputValidation.idValidation("V", "Enter the vehicle ID you want to deploy:");
         System.out.println();
-        Vehicle selectedVehicle = null;
-        for (Vehicle vehicle : vehicleList) {
-            if (vehicle.getVehicleId().equals(vehicleId)) {
-                selectedVehicle = vehicle;
-                break;
-            }
-        }
+        Vehicle selectedVehicle = vehicleController.getVehicleById(vehicleId);
 
         if (selectedVehicle != null) {
             // Ask for destination port
@@ -166,6 +180,43 @@ public class VehicleServicesManager extends ManagerBaseServices implements Vehic
 
             // Send message to the user
             uiUtils.printSuccessMessage("Vehicle deployed successfully!");
+        } else {
+            uiUtils.printFailedMessage("No vehicle found with the given ID.");
+        }
+    }
+
+    public void unloadVehicle() {
+        uiUtils.clearScreen();
+
+        uiUtils.printFunctionName("UNLOAD VEHICLE", 82);
+        System.out.println();
+
+        // Display all vehicles at the managed port
+        List<Vehicle> vehicles = vehicleController.fetchVehiclesFromDatabase();
+        uiUtils.printTopBorderWithTableName("LOADED VEHICLES AT YOUR PORT", 15, 15, 20, 20);
+        System.out.printf("| %-15s | %-15s | %-20s | %-20s |\n", "Vehicle ID", "Licensed Plate", "Current Fuel", "Fuel Capacity");
+        uiUtils.printHorizontalLine(15, 15, 20, 20);
+        for (Vehicle vehicle : vehicles) {
+            if (vehicle.getCurrentPort() == null) {
+                continue;
+            }
+            if (vehicle.getCurrentPort().getPortId().equals(managedPort.getPortId())) {
+                if (!vehicle.getContainers().isEmpty()) {
+                    System.out.printf("| %-15s | %-15s | %-20.2f | %-20.2f |\n", vehicle.getVehicleId(), vehicle.getName(), vehicle.getCurrentFuel(), vehicle.getFuelCapacity());
+                }
+            }
+        }
+        uiUtils.printHorizontalLine(15, 15, 20, 20);
+
+        // Get input for vehicle id
+        String vehicleId = inputValidation.idValidation("V", "Enter the vehicle ID you want to unload:");
+        System.out.println();
+        Vehicle selectedVehicle = vehicleController.getVehicleById(vehicleId);
+
+        if (selectedVehicle != null) {
+            selectedVehicle.emptyContainers();
+            vehicleController.updateVehicleInDatabase(selectedVehicle);
+            uiUtils.printSuccessMessage("Unload successful!");
         } else {
             uiUtils.printFailedMessage("No vehicle found with the given ID.");
         }
@@ -218,32 +269,28 @@ public class VehicleServicesManager extends ManagerBaseServices implements Vehic
         String vehicleId = inputValidation.idValidation("V", "Enter the vehicle ID you want to add:");
         System.out.println();
 
-        Vehicle vehicleToAdd = null;
-        int indexToUpdate = -1;
-        for (int i = 0; i < vehicleList.size(); i++) {
-            if (vehicleList.get(i).getVehicleId().equals(vehicleId) && vehicleList.get(i).getCurrentPort() == null) {
-                vehicleToAdd = vehicleList.get(i);
-                indexToUpdate = i;
-                break;
+        Vehicle vehicleToAdd = findUnoccupiedVehicleById(vehicleList, vehicleId);
+
+        if (vehicleToAdd == null) {
+            uiUtils.printFailedMessage("No unoccupied vehicle with ID " + vehicleId + " found!");
+            return;
+        }
+
+        managedPort.addVehicle(vehicleToAdd);
+        vehicleToAdd.setCurrentPort(managedPort);
+
+        vehicleController.updateVehicleInDatabase(vehicleToAdd);
+
+        uiUtils.printSuccessMessage("Vehicle with ID " + vehicleId + " added successfully!");
+    }
+
+    private Vehicle findUnoccupiedVehicleById(List<Vehicle> vehicleList, String vehicleId) {
+        for (Vehicle vehicle : vehicleList) {
+            if (vehicle.getVehicleId().equals(vehicleId) && vehicle.getCurrentPort() == null) {
+                return vehicle;
             }
         }
-
-        if (vehicleToAdd != null) {
-            managedPort.addVehicle(vehicleToAdd);
-            vehicleToAdd.setCurrentPort(managedPort);
-
-            // Update container's currentPort attribute to reflect the new location
-            vehicleToAdd.setCurrentPort(managedPort); // Assuming your Port object has a getPortName() method
-            vehicleList.set(indexToUpdate, vehicleToAdd); // Replace the old container with the updated one in the list
-
-            // Write the updated list back to the database
-            dbHandler.writeObjects(VEHICLE_FILE_PATH, vehicleList.toArray(new Vehicle[0]));
-            vehicleController.updateVehicleInDatabase(vehicleToAdd);
-
-            uiUtils.printSuccessMessage("Vehicle with ID " + vehicleId + "added successfully!");
-        } else {
-            uiUtils.printFailedMessage("No vehicle with ID " + vehicleId + " found!");
-        }
+        return null;
     }
 
     @Override

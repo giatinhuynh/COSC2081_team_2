@@ -51,10 +51,16 @@ public class ContainerServicesAdmin extends AdminBaseServices implements Contain
     }
 
     // Modularized method to find a container by its ID
-    private Optional<Container> findContainerById(String containerId) {
+    public Optional<Container> findContainerById(String containerId) {
         return fetchContainersFromDatabase().stream()
                 .filter(container -> container.getContainerId().equals(containerId))
                 .findFirst();
+    }
+
+    public Container getContainerById(String containerId) {
+        return fetchContainersFromDatabase().stream()
+                .filter(container -> container.getContainerId().equals(containerId))
+                .findFirst().orElse(null);
     }
 
     public boolean uniqueContainerIdCheck(String containerId) {
@@ -167,14 +173,18 @@ public class ContainerServicesAdmin extends AdminBaseServices implements Contain
     }
 
     public void displayContainerTableRow(Container container) {
-        if (container.getCurrentPort() == null) {
+        if (container.getCurrentPort() == null && container.getCurrentVehicle() == null) {
             System.out.printf("| %-15s | %-20s | %-15.2f | %-20s |\n",
                     container.getContainerId(), container.getContainerType(),
                     container.getWeight(), "N/A");
+        } else if (container.getCurrentPort() == null) {
+            System.out.printf("| %-15s | %-20s | %-15.2f | %-20s |\n",
+                    container.getContainerId(), container.getContainerType(),
+                    container.getWeight(), container.getCurrentVehicle().getName());
         } else {
             System.out.printf("| %-15s | %-20s | %-15.2f | %-20s |\n",
                     container.getContainerId(), container.getContainerType(),
-                    container.getWeight(), container.getLocation());
+                    container.getWeight(), container.getCurrentPort().getName());
         }
     }
 

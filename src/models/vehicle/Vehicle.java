@@ -115,6 +115,14 @@ public abstract class Vehicle implements Serializable {
             return "In port";
         }
     }
+
+    public List<Container> getContainers() {
+        return containers;
+    }
+
+    public void emptyContainers() {
+        this.containers = new ArrayList<>();
+    }
 }
 
 
