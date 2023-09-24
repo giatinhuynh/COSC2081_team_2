@@ -4,6 +4,8 @@ import models.container.*;
 import models.port.Port;
 import utils.DistanceCalculator;
 
+import java.util.ArrayList;
+
 public class Truck extends Vehicle {
 
     protected double truckAvgSpeed = 88.5; // 55 miles per hour in km/h
@@ -16,6 +18,11 @@ public class Truck extends Vehicle {
 
     public Truck(String vehicleId, String name, double currentFuel, double carryingCapacity, double fuelCapacity, TruckType type) {
         super(vehicleId, name, currentFuel, carryingCapacity, fuelCapacity);
+        this.type = type;
+    }
+
+    public Truck(String vehicleId, String name, double currentFuel, double carryingCapacity, double fuelCapacity, TruckType type, Port currentPort) {
+        super(vehicleId, name, currentFuel, carryingCapacity, fuelCapacity, currentPort);
         this.type = type;
     }
 
@@ -64,5 +71,9 @@ public class Truck extends Vehicle {
                 destinationPort.getLongitude()
         );
         return distance / this.truckAvgSpeed;
+    }
+
+    public String getType() {
+        return String.valueOf(type);
     }
 }

@@ -5,44 +5,45 @@ import models.vehicle.Vehicle;
 import utils.DistanceCalculator;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.List;
 import java.util.ArrayList;
 
 public class Port implements Serializable {
 
     // Attributes
-    private String portId;
+    private final String portId;  // Making it final to ensure immutability
     private String name;
     private double latitude;
     private double longitude;
     private double storingCapacity;
     private boolean landingAbility;
-    private List<Container> currentContainers;
-    private List<Vehicle> currentVehicles;
+    private final List<Container> currentContainers;  // Lists are mutable, but we'll handle that in getters
+    private final List<Vehicle> currentVehicles;
 
     // Constructors
     public Port(String portId) {
+        if (portId == null || portId.trim().isEmpty()) {
+            throw new IllegalArgumentException("portId cannot be null or empty");
+        }
+
         this.portId = portId;
+        this.currentContainers = new ArrayList<>();
+        this.currentVehicles = new ArrayList<>();
     }
 
     public Port(String portId, String name, double latitude, double longitude, double storingCapacity, boolean landingAbility) {
-        this.portId = portId;
+        this(portId);  // Calling the other constructor
         this.name = name;
         this.latitude = latitude;
         this.longitude = longitude;
         this.storingCapacity = storingCapacity;
         this.landingAbility = landingAbility;
-        this.currentContainers = new ArrayList<>();
-        this.currentVehicles = new ArrayList<>();
     }
 
     // Getters and setters
     public String getPortId() {
         return portId;
-    }
-
-    public void setPortId(String portId) {
-        this.portId = portId;
     }
 
     public String getName() {
@@ -86,57 +87,51 @@ public class Port implements Serializable {
     }
 
     public List<Container> getCurrentContainers() {
-        return currentContainers;
+        return Collections.unmodifiableList(currentContainers);
+    }
+
+    public List<Vehicle> getCurrentVehicles() {
+        return Collections.unmodifiableList(currentVehicles);
     }
 
     // Methods
-    /**
-     * Calculates the distance in kilometers between the current port and another port
-     * using their respective latitude and longitude coordinates. This method utilizes
-     * the Haversine formula for distance calculation.
-     *
-     * @param anotherPort The port to which the distance is calculated.
-     * @return The distance in kilometers between the current port and the specified port.
-     */
     public double calculateDistanceToAnotherPort(Port anotherPort) {
+        if (anotherPort == null) {
+            throw new IllegalArgumentException("anotherPort cannot be null");
+        }
+
         return DistanceCalculator.calculateDistance(
                 this.latitude, this.longitude, anotherPort.latitude, anotherPort.longitude
         );
     }
 
-    /**
-     * Adds a vehicle to the list of vehicles associated with this port.
-     *
-     * @param vehicle The vehicle to be added.
-     */
     public void addVehicle(Vehicle vehicle) {
+        if (vehicle == null) {
+            throw new IllegalArgumentException("vehicle cannot be null");
+        }
         this.currentVehicles.add(vehicle);
     }
 
-    /**
-     * Removes a vehicle from the list of vehicles associated with this port.
-     *
-     * @param vehicle The vehicle to be removed.
-     */
     public void removeVehicle(Vehicle vehicle) {
         this.currentVehicles.remove(vehicle);
     }
 
-    /**
-     * Adds a container to the list of containers associated with this port.
-     *
-     * @param container The container to be added.
-     */
     public void addContainer(Container container) {
+        if (container == null) {
+            throw new IllegalArgumentException("container cannot be null");
+        }
         this.currentContainers.add(container);
     }
 
-    /**
-     * Removes a container from the list of containers associated with this port.
-     *
-     * @param container The container to be removed.
-     */
     public void removeContainer(Container container) {
         this.currentContainers.remove(container);
+    }
+
+    public double getOccupiedCapacity() {
+        double occupiedCapacity = 0;
+        for (Container container : this.currentContainers) {
+            occupiedCapacity += container.getWeight();
+        }
+        return occupiedCapacity;
     }
 }

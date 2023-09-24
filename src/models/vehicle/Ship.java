@@ -12,6 +12,10 @@ public class Ship extends Vehicle {
         super(vehicleId, name, currentFuel, carryingCapacity, fuelCapacity);
     }
 
+    public Ship(String vehicleId, String name, double currentFuel, double carryingCapacity, double fuelCapacity, Port currentPort) {
+        super(vehicleId, name, currentFuel, carryingCapacity, fuelCapacity, currentPort);
+    }
+
     @Override
     public boolean canCarry(Container container) {
         return true;
@@ -19,6 +23,9 @@ public class Ship extends Vehicle {
 
     @Override
     public double calculateFuelNeeded(Port destinationPort) {
+        if (this.currentPort == null) {
+            throw new IllegalStateException("The ship is not currently at a port!");
+        }
         Port currentPort = this.currentPort;
         double distance = DistanceCalculator.calculateDistance(
                 currentPort.getLatitude(),
@@ -43,6 +50,9 @@ public class Ship extends Vehicle {
 
     @Override
     public double calculateTimeNeeded(Port destinationPort) {
+        if (this.currentPort == null) {
+            throw new IllegalStateException("The ship is not currently at a port!");
+        }
         Port currentPort = this.currentPort;
         double distance = DistanceCalculator.calculateDistance(
                 currentPort.getLatitude(),
