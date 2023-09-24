@@ -80,10 +80,21 @@ public class ContainerServicesManager extends ManagerBaseServices implements Con
         // Get input for container id
         String containerId = inputValidation.idValidation("C", "Enter container ID you want to load: ");
         System.out.println();
+
+        List<Port> portsList = portServicesAdmin.fetchPortsFromDatabase();
+        if (containerId.equals(managedPort.getPortId())) {
+            System.out.println("You cannot arrive at your own port!");
+            uiUtils.printFailedMessage("Abort loading...");
+            return;
+        } else if (findContainerById(containerId) == null) {
+            System.out.println("The ID you entered does not match any port in the system");
+            uiUtils.printFailedMessage("Abort loading...");
+            return;
+        }
         Container selectedContainer = findContainerById(containerId);
 
         // Show all ports except manager's port
-        List<Port> portsList = portServicesAdmin.fetchPortsFromDatabase();
+
         uiUtils.printTopBorderWithTableName("AVAILABLE DESTINATION PORTS", 10, 30, 10, 10, 25, 25);
         System.out.printf("| %-10s | %-30s | %-10s | %-10s | %-25s | %-25s |\n",
                 "Port ID", "Name", "Latitude", "Longitude", "Storing Capacity (kg)", "Landing Ability (T/F)");
@@ -107,10 +118,16 @@ public class ContainerServicesManager extends ManagerBaseServices implements Con
         List<Vehicle> vehicleList = vehicleServicesAdmin.fetchVehiclesFromDatabase();
         uiUtils.printTopBorderWithTableName("AVAILABLE VEHICLES", 15, 20);
         for (Vehicle vehicle : vehicleList) {
-            if (vehicle.getCurrentPort().getPortId().equals(managedPort.getPortId())) {
-                if ((destinationPort.getLandingAbility() || vehicle instanceof Ship) && vehicle.canCarry(selectedContainer) && vehicle.canMoveToPort(destinationPort)) {
-                    System.out.printf("| %-15s | %-20s |\n" , vehicle.getVehicleId(), vehicle.getName());
+            if (vehicle.getCurrentPort() != null) {
+                if (vehicle.getCurrentPort().getPortId().equals(managedPort.getPortId())) {
+                    if ((destinationPort.getLandingAbility() || vehicle instanceof Ship) && vehicle.canCarry(selectedContainer) && vehicle.canMoveToPort(destinationPort)) {
+                        System.out.printf("| %-15s | %-20s |\n", vehicle.getVehicleId(), vehicle.getName());
+                    }
                 }
+            } else {
+                System.out.println("No vehicle available");
+                uiUtils.printFailedMessage("Abort loading...");
+                return;
             }
         }
         uiUtils.printHorizontalLine(15, 20);

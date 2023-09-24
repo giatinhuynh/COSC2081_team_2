@@ -316,20 +316,22 @@ public class VehicleServicesManager extends ManagerBaseServices implements Vehic
         uiUtils.printHorizontalLine(15, 20, 20, 25, 20, 15, 15);
 
         for (Vehicle vehicle : vehiclesList) {
-            if (vehicle.getCurrentPort().getPortId().equals(managedPort.getPortId())) {
-                String vehicleType = "";
-                String truckType = "N/A";
+            if (vehicle.getCurrentPort() != null) {
+                if (vehicle.getCurrentPort().getPortId().equals(managedPort.getPortId())) {
+                    String vehicleType = "";
+                    String truckType = "N/A";
 
-                if (vehicle instanceof Truck) {
-                    vehicleType = "Truck";
-                    truckType = ((Truck) vehicle).getType();
-                } else if (vehicle instanceof Ship) {
-                    vehicleType = "Ship";
+                    if (vehicle instanceof Truck) {
+                        vehicleType = "Truck";
+                        truckType = ((Truck) vehicle).getType();
+                    } else if (vehicle instanceof Ship) {
+                        vehicleType = "Ship";
+                    }
+
+                    System.out.printf("| %-15s | %-20s | %-20.2f | %-25.2f | %-20.2f | %-15s | %-15s |\n",
+                            vehicle.getVehicleId(), vehicle.getName(), vehicle.getCurrentFuel(),
+                            vehicle.getCarryingCapacity(), vehicle.getFuelCapacity(), vehicleType, truckType);
                 }
-
-                System.out.printf("| %-15s | %-20s | %-20.2f | %-25.2f | %-20.2f | %-15s | %-15s |\n",
-                        vehicle.getVehicleId(), vehicle.getName(), vehicle.getCurrentFuel(),
-                        vehicle.getCarryingCapacity(), vehicle.getFuelCapacity(), vehicleType, truckType);
             }
         }
         uiUtils.printHorizontalLine(15, 20, 20, 25, 20, 15, 15);
