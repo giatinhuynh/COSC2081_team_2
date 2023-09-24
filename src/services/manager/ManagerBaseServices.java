@@ -8,6 +8,8 @@ import models.vehicle.Vehicle;
 import services.admin.PortServicesAdmin;
 import utils.CurrentUser;
 
+import java.util.List;
+
 public abstract class ManagerBaseServices implements ManagerInterface {
 
     private final PortServicesAdmin portServices = new PortServicesAdmin();
@@ -35,11 +37,30 @@ public abstract class ManagerBaseServices implements ManagerInterface {
     }
 
     Vehicle findVehicleById(String id) {
-        for (Vehicle vehicle : managedPort.getCurrentVehicles()) {
-            if (vehicle.getVehicleId().equals(id)) {
+        // Check if managedPort is null
+        if (managedPort == null) {
+            System.out.println("managedPort is null!");
+            return null;
+        }
+
+        // Fetch the current vehicles and check if it returns null
+        List<Vehicle> vehicles = managedPort.getCurrentVehicles();
+        if (vehicles == null) {
+            System.out.println("getCurrentVehicles() returned null!");
+            return null;
+        }
+
+        // Iterate through the vehicles and find the one with the matching ID
+        for (Vehicle vehicle : vehicles) {
+            // Check if any vehicle's ID is null
+            if (vehicle.getVehicleId() == null) {
+                System.out.println("A vehicle has a null ID!");
+            } else if (vehicle.getVehicleId().equals(id)) {
                 return vehicle;
             }
         }
+
+        // If no vehicle with the provided ID is found, return null
         return null;
     }
 }

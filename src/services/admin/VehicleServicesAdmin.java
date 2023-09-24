@@ -17,6 +17,7 @@ package services.admin;
 
 import exceptions.TypeCheck;
 import interfaces.CRUD.VehicleCRUD;
+import models.container.Container;
 import utils.Constants;
 import database.DatabaseHandler;
 import models.vehicle.Vehicle;
@@ -48,6 +49,20 @@ public class VehicleServicesAdmin extends AdminBaseServices implements VehicleCR
         return vehiclesList;
     }
 
+    private Optional<Vehicle> findVehicleById(String vehicleId) {
+        return fetchVehiclesFromDatabase().stream()
+                .filter(vehicle -> vehicle.getVehicleId().equals(vehicleId))
+                .findFirst();
+    }
+
+    public boolean uniqueVehicleIdCheck(String vehicleId) {
+        if (findVehicleById(vehicleId).isPresent()) {
+            uiUtils.printFailedMessage("Vehicle with ID " + vehicleId + " already exists.");
+            return false;
+        }
+        return true;
+    }
+
     @Override
     public void createNewVehicle() {
         uiUtils.clearScreen();
@@ -55,8 +70,11 @@ public class VehicleServicesAdmin extends AdminBaseServices implements VehicleCR
         uiUtils.printFunctionName("VEHICLE CREATION WIZARD", 100);
         System.out.println();
 
-        String vehicleId = inputValidation.idValidation("V", "Enter vehicle ID: ");
-        System.out.println();
+        String vehicleId;
+        do {
+            vehicleId = inputValidation.idValidation("V", "Enter vehicle ID to create:");
+            System.out.println();
+        } while (!uniqueVehicleIdCheck(vehicleId));
 
         String name = inputValidation.getString("Enter vehicle name:");
         System.out.println();
@@ -86,6 +104,9 @@ public class VehicleServicesAdmin extends AdminBaseServices implements VehicleCR
                 Truck.TruckType type = Truck.TruckType.valueOf(scanner.nextLine().toUpperCase());
                 newVehicle = new Truck(vehicleId, name, currentFuel, carryingCapacity, fuelCapacity, type);
             }
+        } else if (!vehicleType.equalsIgnoreCase("Ship")) {
+            uiUtils.printFailedMessage("Invalid vehicle type. Please enter a valid vehicle type.");
+            return;
         } else {
             newVehicle = new Ship(vehicleId, name, currentFuel, carryingCapacity, fuelCapacity);
         }

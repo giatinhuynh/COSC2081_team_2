@@ -60,8 +60,6 @@ public class ContainerServicesAdmin extends AdminBaseServices implements Contain
     public boolean uniqueContainerIdCheck(String containerId) {
         if (findContainerById(containerId).isPresent()) {
             uiUtils.printFailedMessage("Container with ID " + containerId + " already exists.");
-            System.out.println("Press enter to try again...");
-            scanner.nextLine();
             return false;
         }
         return true;
@@ -75,10 +73,10 @@ public class ContainerServicesAdmin extends AdminBaseServices implements Contain
         uiUtils.printFunctionName("CONTAINER CREATION WIZARD", 100);
         System.out.println();
 
-        String containerId = inputValidation.idValidation("C", "Enter container ID to create: ");
-        if (!uniqueContainerIdCheck(containerId)) {
-            return;  // Exit the creation process if the ID is not unique
-        }
+        String containerId;
+        do {
+            containerId = inputValidation.idValidation("C", "Enter container ID to create: ");
+        } while (!uniqueContainerIdCheck(containerId));  // Keep asking until a unique ID is provided
         System.out.println();
 
         double weight = inputValidation.getDouble("Enter container weight:");
